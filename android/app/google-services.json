@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "410480316998",
+    "project_id": "family360-a1377",
+    "storage_bucket": "family360-a1377.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:410480316998:android:2482019d839d1d6a1e7047",
+        "android_client_info": {
+          "package_name": "com.locationtracker"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "410480316998-prmr4pjok0r0csvuvk5tee8p2rps52h5.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBkMeVIl5ZN9ntCQEBihobdr6D4SZLUrmQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "410480316998-prmr4pjok0r0csvuvk5tee8p2rps52h5.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
