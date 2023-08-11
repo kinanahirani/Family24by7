@@ -15,7 +15,11 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import storage from '@react-native-firebase/storage';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import AntDesign from 'react-native-vector-icons/AntDesign';
-import {horizontalScale, moderateScale, verticalScale} from '../helpers/sizeHelpers';
+import {
+  horizontalScale,
+  moderateScale,
+  verticalScale,
+} from '../helpers/sizeHelpers';
 
 const uploadProfilePicture = async (userId, profilePicture) => {
   const {path} = profilePicture;
@@ -225,7 +229,7 @@ const EnterUserDetails = ({navigation}) => {
             <AntDesign name="pluscircle" size={24} color={'black'} />
           </View>
         </TouchableOpacity>
-        <View style={{marginTop: verticalScale(33), width:'80%'}}>
+        <View style={{marginTop: verticalScale(33), width: '80%'}}>
           <TextInput
             mode="flat"
             label="Name"
@@ -269,7 +273,7 @@ const styles = StyleSheet.create({
   profileImage: {
     width: moderateScale(120),
     height: moderateScale(120),
-    borderRadius:moderateScale(120),
+    borderRadius: moderateScale(120),
   },
   addIconContainer: {
     position: 'absolute',
