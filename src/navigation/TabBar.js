@@ -1,4 +1,4 @@
-import {StyleSheet, Text, View} from 'react-native';
+import {Dimensions, StyleSheet, Text, View} from 'react-native';
 import React, {useEffect} from 'react';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import MapScreen from '../screens/MapScreen';
@@ -9,6 +9,7 @@ import Entypo from 'react-native-vector-icons/Entypo';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import FontAwesome6 from 'react-native-vector-icons/FontAwesome6';
 import Feather from 'react-native-vector-icons/Feather';
+import {moderateScale, verticalScale} from '../helpers/sizeHelpers';
 
 const Tab = createBottomTabNavigator();
 
@@ -18,23 +19,27 @@ const TabBar = () => {
       screenOptions={{
         headerShown: false,
         tabBarShowLabel: true,
-        tabBarIconStyle: {
+        tabBarStyle: {
+          height: '10%',
           width: '100%',
         },
-        tabBarStyle: {
-          height: 70,
-        },
         tabBarItemStyle: {
+          flex: 1,
           alignItems: 'center',
           justifyContent: 'center',
         },
+        tabBarLabelPosition: 'below-icon',
       }}>
       <Tab.Screen
         name="map"
         component={MapScreen}
         options={{
-          tabBarLabel: ({ focused }) => (
-            <Text style={{ marginBottom: 7, color: focused ? 'rgba(119,79,251,255)' : 'grey' }}>
+          tabBarLabel: ({focused}) => (
+            <Text
+              style={{
+                marginBottom: verticalScale(7),
+                color: focused ? 'rgba(119,79,251,255)' : 'grey',
+              }}>
               Map
             </Text>
           ),
@@ -44,11 +49,11 @@ const TabBar = () => {
                 {focused ? (
                   <Entypo
                     name="home"
-                    size={25}
+                    size={moderateScale(22)}
                     color={'rgba(119,79,251,255)'}
                   />
                 ) : (
-                  <Entypo name="home" size={25} color={'grey'} />
+                  <Entypo name="home" size={moderateScale(22)} color={'grey'} />
                 )}
               </View>
             );
@@ -59,8 +64,12 @@ const TabBar = () => {
         name="safety"
         component={SafetyScreen}
         options={{
-          tabBarLabel: ({ focused }) => (
-            <Text style={{ marginBottom: 7, color: focused ? 'rgba(119,79,251,255)' : 'grey' }}>
+          tabBarLabel: ({focused}) => (
+            <Text
+              style={{
+                marginBottom: verticalScale(7),
+                color: focused ? 'rgba(119,79,251,255)' : 'grey',
+              }}>
               Safety
             </Text>
           ),
@@ -70,13 +79,13 @@ const TabBar = () => {
                 {focused ? (
                   <MaterialIcons
                     name="health-and-safety"
-                    size={25}
+                    size={moderateScale(22)}
                     color={'rgba(119,79,251,255)'}
                   />
                 ) : (
                   <MaterialIcons
                     name="health-and-safety"
-                    size={25}
+                    size={moderateScale(22)}
                     color={'grey'}
                   />
                 )}
@@ -89,8 +98,12 @@ const TabBar = () => {
         name="places"
         component={PlacesScreen}
         options={{
-          tabBarLabel: ({ focused }) => (
-            <Text style={{ marginBottom: 7, color: focused ? 'rgba(119,79,251,255)' : 'grey' }}>
+          tabBarLabel: ({focused}) => (
+            <Text
+              style={{
+                marginBottom: verticalScale(7),
+                color: focused ? 'rgba(119,79,251,255)' : 'grey',
+              }}>
               Places
             </Text>
           ),
@@ -100,11 +113,15 @@ const TabBar = () => {
                 {focused ? (
                   <FontAwesome6
                     name="location-dot"
-                    size={25}
+                    size={moderateScale(20)}
                     color={'rgba(119,79,251,255)'}
                   />
                 ) : (
-                  <FontAwesome6 name="location-dot" size={25} color={'grey'} />
+                  <FontAwesome6
+                    name="location-dot"
+                    size={moderateScale(20)}
+                    color={'grey'}
+                  />
                 )}
               </View>
             );
@@ -115,8 +132,12 @@ const TabBar = () => {
         name="menu"
         component={MenuScreen}
         options={{
-          tabBarLabel: ({ focused }) => (
-            <Text style={{ marginBottom: 7, color: focused ? 'rgba(119,79,251,255)' : 'grey' }}>
+          tabBarLabel: ({focused}) => (
+            <Text
+              style={{
+                marginBottom: verticalScale(7),
+                color: focused ? 'rgba(119,79,251,255)' : 'grey',
+              }}>
               Menu
             </Text>
           ),
@@ -126,11 +147,15 @@ const TabBar = () => {
                 {focused ? (
                   <Feather
                     name="menu"
-                    size={25}
+                    size={moderateScale(20)}
                     color={'rgba(119,79,251,255)'}
                   />
                 ) : (
-                  <Feather name="menu" size={25} color={'grey'} />
+                  <Feather
+                    name="menu"
+                    size={moderateScale(20)}
+                    color={'grey'}
+                  />
                 )}
               </View>
             );

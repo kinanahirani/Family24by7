@@ -1,14 +1,7 @@
 import React, {useEffect, useState} from 'react';
-import {
-  StyleSheet,
-  Text,
-  View,
-  Image,
-  TouchableOpacity,
-  // TextInput,
-} from 'react-native';
+import {StyleSheet, Text, View, Image, TouchableOpacity} from 'react-native';
 import ImageCropPicker from 'react-native-image-crop-picker';
-import {useSelector} from 'react-redux';
+import {useDispatch, useSelector} from 'react-redux';
 import {TextInput, HelperText} from 'react-native-paper';
 import firestore from '@react-native-firebase/firestore';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -20,78 +13,34 @@ import {
   moderateScale,
   verticalScale,
 } from '../helpers/sizeHelpers';
-
-const uploadProfilePicture = async (userId, profilePicture) => {
-  const {path} = profilePicture;
-  const email = await AsyncStorage.getItem('EMAIL');
-  const imageRef = storage().ref(`Profile Pictures/${email}.jpg`);
-
-  try {
-    const response = await fetch(path);
-    const blob = await response.blob();
-
-    await imageRef.put(blob);
-    const downloadUrl = await imageRef.getDownloadURL();
-    console.log('Profile picture uploaded:', downloadUrl);
-    return downloadUrl;
-  } catch (error) {
-    console.log('Error uploading profile picture:', error);
-    return null;
-  }
-};
+import {useForm, Controller} from 'react-hook-form';
+import {setUserData} from '../redux/slices/userSlice';
 
 const EnterUserDetails = ({navigation}) => {
-  const data = useSelector(state => state.user.data);
-  const [firstName, setFirstName] = useState('');
-  const [lastName, setLastName] = useState('');
+  const userData = useSelector(state => state.user.data);
+  const dispatch = useDispatch();
   const [profilePicture, setProfilePicture] = useState(null);
 
-  // const fetchUserDetails = async () => {
-  //   try {
-  //     const userId = await AsyncStorage.getItem('USER_ID');
-  //     const userRef = firestore().collection('users').doc(userId);
-  //     const userDoc = await userRef.get();
+  const {
+    control,
+    handleSubmit,
+    getValues,
+    formState: {errors, isValid},
+  } = useForm({
+    defaultValues: {
+      contact: userData.mobileNumber || '',
+    },
+  });
 
-  //     if (userDoc.exists) {
-  //       const userData = userDoc.data();
-  //       const fetchedFirstName = userData.firstName || '';
-  //       const fetchedLastName = userData.lastName || '';
-  //       const fetchedProfilePic = userData.profilePicture || null;
-
-  //       setFirstName(fetchedFirstName);
-  //       setLastName(fetchedLastName);
-
-  //       if (fetchedProfilePic) {
-  //         const response = await fetch(fetchedProfilePic);
-  //         const blob = await response.blob();
-  //         const profilePictureObject = {
-  //           path: fetchedProfilePic,
-  //           data: blob._data,
-  //         };
-  //         setProfilePicture(profilePictureObject);
-  //       }
-  //     } else {
-  //       console.log('User document does not exist');
-  //     }
-  //   } catch (error) {
-  //     console.log('Error fetching user details from Firestore:', error);
-  //   }
-  // };
-
-  const fetchUserDetails = async () => {
+  const fetchProfilePic = async () => {
     try {
-      const userId = await AsyncStorage.getItem('USER_ID');
+      const userId = userData.id;
       const userRef = firestore().collection('users').doc(userId);
       const userDoc = await userRef.get();
 
       if (userDoc.exists) {
-        const userData = userDoc.data();
-        const fetchedFirstName = userData.firstName || '';
-        const fetchedLastName = userData.lastName || '';
-        const fetchedProfilePic = userData.profilePicture || null;
-
-        setFirstName(fetchedFirstName);
-        setLastName(fetchedLastName);
+        const user = userDoc.data();
+        const fetchedProfilePic = user.profilePicture || null;
 
         if (fetchedProfilePic) {
           setProfilePicture({path: fetchedProfilePic});
@@ -106,56 +55,48 @@ const EnterUserDetails = ({navigation}) => {
 
   useEffect(() => {
     const unsubscribe = navigation.addListener('focus', () => {
-      fetchUserDetails();
+      fetchProfilePic();
     });
+
     return unsubscribe;
   }, [navigation]);
 
-  const handleSave = async () => {
-    const userId = await AsyncStorage.getItem('USER_ID');
-    await updateUserDetails(userId, firstName, lastName);
+  const uploadProfilePicture = async (userId, profilePicture) => {
+    const {path} = profilePicture;
+    const email = userData.email;
+    const imageRef = storage().ref(`Profile Pictures/${email}.jpg`);
 
+    try {
+      await imageRef.putFile(path);
+      const downloadUrl = await imageRef.getDownloadURL();
+      console.log('Profile picture uploaded:', downloadUrl);
+      return downloadUrl;
+    } catch (error) {
+      console.log('Error uploading profile picture:', error);
+      return null;
+    }
+  };
+
+  const handleSave = async () => {
+    const userId = userData.id;
     if (profilePicture) {
       const downloadUrl = await uploadProfilePicture(userId, profilePicture);
       await firestore().collection('users').doc(userId).update({
         profilePicture: downloadUrl,
       });
+      dispatch(setUserData({...userData, imageURL: profilePicture}));
     }
 
+    const contactValue = getValues('contact');
+
+    if (contactValue) {
+      await firestore().collection('users').doc(userId).update({
+        mobileNumber: contactValue,
+      });
+
+      dispatch(setUserData({...userData, mobileNumber: contactValue}));
+    }
     navigation.navigate('tabbar');
-  };
-
-  const updateUserDetails = async (userId, firstName, lastName) => {
-    try {
-      const updateData = {};
-
-      if (firstName) {
-        await AsyncStorage.setItem('FNAME', firstName);
-        updateData.firstName = firstName;
-      }
-
-      if (lastName) {
-        await AsyncStorage.setItem('LNAME', lastName);
-        updateData.lastName = lastName;
-      }
-
-      if (profilePicture) {
-        await AsyncStorage.setItem(
-          'PROFILE_PIC',
-          JSON.stringify(profilePicture),
-        );
-        updateData.profilePicture = profilePicture;
-      }
-
-      if (Object.keys(updateData).length > 0) {
-        await firestore().collection('users').doc(userId).update(updateData);
-        console.log('User details updated in Firestore');
-      } else {
-        console.log('No fields to update');
-      }
-    } catch (error) {
-      console.log('Error updating user details in Firestore:', error);
-    }
   };
 
   const handleMainPhotoUpload = () => {
@@ -233,29 +174,51 @@ const EnterUserDetails = ({navigation}) => {
           <TextInput
             mode="flat"
             label="Name"
-            value={data.name}
+            value={userData.name}
             onChangeText={text => setFirstName(text)}
             style={styles.input}
           />
           <TextInput
             mode="flat"
             label="Email"
-            value={data.email}
+            value={userData.email}
             onChangeText={text => setLastName(text)}
             style={styles.input}
           />
-          <TextInput
-            mode="flat"
-            label="Conatct Number"
-            value={lastName}
-            onChangeText={text => setLastName(text)}
-            style={styles.input}
+          <Controller
+            control={control}
+            rules={{
+              required: 'Contact number is required.',
+            }}
+            render={({field: {onChange, onBlur, value}}) => (
+              <>
+                <TextInput
+                  mode="flat"
+                  label="Conatct Number"
+                  onBlur={onBlur}
+                  onChangeText={onChange}
+                  value={value}
+                  style={styles.input}
+                  error={errors.contact}
+                />
+                {errors.contact && (
+                  <HelperText
+                    type="error"
+                    style={{
+                      alignSelf: 'flex-start',
+                    }}>
+                    {errors.contact.message}
+                  </HelperText>
+                )}
+              </>
+            )}
+            name="contact"
           />
         </View>
         <TouchableOpacity
           activeOpacity={0.7}
           style={styles.saveButton}
-          onPress={handleSave}>
+          onPress={handleSubmit(handleSave)}>
           <Text style={styles.saveButtonText}>Save</Text>
         </TouchableOpacity>
       </View>
@@ -280,8 +243,8 @@ const styles = StyleSheet.create({
     bottom: 0,
     right: 0,
     backgroundColor: 'white',
-    borderRadius: moderateScale(20),
-    padding: 3,
+    borderRadius: moderateScale(30),
+    padding: 10,
   },
   addIcon: {
     width: 24,

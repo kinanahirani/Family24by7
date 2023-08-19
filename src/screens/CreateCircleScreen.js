@@ -1,5 +1,4 @@
 import {
-  KeyboardAvoidingView,
   ScrollView,
   StyleSheet,
   Text,
@@ -17,6 +16,7 @@ import {
 } from '../helpers/sizeHelpers';
 
 const CreateCircleScreen = () => {
+  const [createCircleCode, setCreateCircleCode] = useState('');
   const [code, setCode] = useState(['', '', '', '', '', '']);
   const codeInputRefs = useRef([]);
   const [createCircleModalVisible, setCreateCircleModalVisible] =
@@ -127,28 +127,22 @@ const CreateCircleScreen = () => {
           }}>
           <View style={styles.centeredView}>
             <View style={styles.modalView}>
-              <Text style={styles.modalText}>
-                Name your Circle
-              </Text>
+              <Text style={styles.modalText}>Name your Circle</Text>
               <TextInput
-                  mode="flat"
-                  label="Enter Family360 email"
-                  style={[styles.textInput, {marginTop: moderateScale(20)}]}
-                //   onBlur={onBlur}
-                //   onChangeText={onChange}
-                //   value={value}
-                />
-              <View style={{flexDirection: 'row',alignSelf:'flex-end'}}>
+                mode="flat"
+                label="Enter Family360 email"
+                style={[styles.textInput, {marginTop: moderateScale(20)}]}
+                onChangeText={text => setCreateCircleCode(text)}
+                value={createCircleCode}
+              />
+              <View style={{flexDirection: 'row', alignSelf: 'flex-end'}}>
                 <Pressable
-                  style={[styles.button, styles.buttonOpen, {marginRight: 10}]}
-                  //   onPress={handleLogout}
-                >
-                  <Text style={styles.textStyle}>Yes</Text>
-                </Pressable>
-                <Pressable
-                  style={[styles.button, styles.buttonClose]}
+                  style={[styles.button, {marginRight: horizontalScale(10)}]}
                   onPress={() => setCreateCircleModalVisible(false)}>
-                  <Text style={styles.textStyle}>No</Text>
+                  <Text style={styles.textStyle}>BACK</Text>
+                </Pressable>
+                <Pressable style={styles.button}>
+                  <Text style={styles.textStyle}>CREATE</Text>
                 </Pressable>
               </View>
             </View>
@@ -191,12 +185,16 @@ const styles = StyleSheet.create({
     marginBottom: moderateScale(20),
     elevation: 7,
   },
-  modalView: {
-    margin: 20,
-    backgroundColor: 'white',
-    borderRadius: 20,
-    padding: 35,
+  centeredView: {
+    flex: 1,
+    justifyContent: 'center',
     alignItems: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+  },
+  modalView: {
+    backgroundColor: 'white',
+    borderRadius: 7,
+    padding: 25,
     shadowColor: '#000',
     shadowOffset: {
       width: 0,
@@ -205,33 +203,27 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.25,
     shadowRadius: 4,
     elevation: 5,
+    width: '85%',
   },
   button: {
-    borderRadius: 10,
     padding: 10,
-    elevation: 2,
-    width: 70,
-  },
-  buttonOpen: {
-    backgroundColor: 'red',
-  },
-  buttonClose: {
-    backgroundColor: 'gray',
+    width: horizontalScale(80),
   },
   textStyle: {
-    color: 'white',
-    fontWeight: 'bold',
+    color: 'rgba(119,79,251,255)',
     textAlign: 'center',
   },
   modalText: {
-    marginBottom: 15,
     fontSize: 16,
-    fontWeight: '600',
-    textAlign: 'center',
+    fontWeight: '500',
+    color: 'black',
   },
-  textInput:{
-    width: '85%',
-    backgroundColor: 'white',
+  textInput: {
+    width: '100%',
+    color: 'black',
+    marginBottom: verticalScale(20),
     fontSize: 14,
-  }
+    borderBottomWidth: 1,
+    borderBottomColor: 'rgba(119,79,251,1)',
+  },
 });

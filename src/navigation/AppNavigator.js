@@ -7,6 +7,8 @@ import SignupWithEmail from '../screens/SignupWithEmail';
 import LoginWithEmail from '../screens/LoginWithEmail';
 import EnterUserDetails from '../screens/EnterUserDetails';
 import CreateCircleScreen from '../screens/CreateCircleScreen';
+import MapScreen from '../screens/MapScreen';
+import DrawerNavigator from './DrawerNavigator';
 
 const Stack = createNativeStackNavigator();
 
@@ -22,6 +24,8 @@ export default AppNavigator = () => {
       <Stack.Screen name="enteruserdetails" component={EnterUserDetails} />
       <Stack.Screen name="tabbar" component={TabBar} />
       <Stack.Screen name="createcircle" component={CreateCircleScreen} />
+      <Stack.Screen name="map" component={MapScreen} />
+      <Stack.Screen name="drawer" component={DrawerNavigator} />
     </Stack.Navigator>
   );
 };

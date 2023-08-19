@@ -52,7 +52,7 @@ const SignupWithEmail = () => {
             //   token: token,
           });
           console.log('user created');
-          navigation.navigate('loginwithemail')
+          navigation.navigate('loginwithemail');
         }
       }
     } catch (error) {
@@ -225,7 +225,10 @@ const SignupWithEmail = () => {
             ]}
             activeOpacity={0.7}>
             <Text style={[styles.loginText, {color: 'black'}]}>
-              ALREADY HAVE AN ACCOUNT? LOGIN HERE!
+              ALREADY HAVE AN ACCOUNT?
+              <Text style={{textDecorationLine: 'underline', color: 'black'}}>
+                LOGIN HERE!
+              </Text>
             </Text>
           </TouchableOpacity>
           <Text

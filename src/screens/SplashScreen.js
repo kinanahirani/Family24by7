@@ -1,13 +1,27 @@
 import {Image, StatusBar, StyleSheet, Text, View} from 'react-native';
 import React, {useEffect} from 'react';
 import {useNavigation} from '@react-navigation/native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import {horizontalScale, verticalScale} from '../helpers/sizeHelpers';
+import {useSelector} from 'react-redux';
 
 const SplashScreen = () => {
   let navigation = useNavigation();
-  useEffect(() => {
-    setTimeout(() => {
-      navigation.navigate('loginoptions');
+  const userData = useSelector(state => state.user.data);
+
+  const checkIsFirst = async () => {
+    setTimeout(async () => {
+      if (userData) {
+        navigation.replace('tabbar');
+      } else {
+        navigation.replace('loginwithemail');
+      }
     }, 3000);
+  };
+
+  useEffect(() => {
+    checkIsFirst();
+    return checkIsFirst;
   }, []);
 
   return (
@@ -28,7 +42,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(119,79,251,255)',
   },
   img: {
-    width: 130,
-    height: 130,
+    width: horizontalScale(130),
+    height: verticalScale(130),
   },
 });
