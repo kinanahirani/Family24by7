@@ -19,8 +19,7 @@ const CreateCircleScreen = () => {
   const [createCircleCode, setCreateCircleCode] = useState('');
   const [code, setCode] = useState(['', '', '', '', '', '']);
   const codeInputRefs = useRef([]);
-  const [createCircleModalVisible, setCreateCircleModalVisible] =
-    useState(false);
+  const [createCircleModalVisible, setCreateCircleModalVisible] = useState(false);
 
   const handleCodeChange = (index, value) => {
     if (value === '') {

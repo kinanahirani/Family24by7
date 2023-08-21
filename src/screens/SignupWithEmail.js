@@ -128,7 +128,7 @@ const SignupWithEmail = () => {
                 type="error"
                 style={{
                   alignSelf: 'flex-start',
-                  marginLeft: moderateScale(30),
+                  marginLeft: horizontalScale(30),
                 }}>
                 Name is required.
               </HelperText>
@@ -155,7 +155,7 @@ const SignupWithEmail = () => {
                 type="error"
                 style={{
                   alignSelf: 'flex-start',
-                  marginLeft: moderateScale(30),
+                  marginLeft: horizontalScale(30),
                 }}>
                 Email is required.
               </HelperText>

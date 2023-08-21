@@ -8,7 +8,7 @@ import {
   Alert,
 } from 'react-native';
 import React, {useState} from 'react';
-import {moderateScale} from '../helpers/sizeHelpers';
+import {horizontalScale, moderateScale} from '../helpers/sizeHelpers';
 import {TextInput, HelperText} from 'react-native-paper';
 import auth from '@react-native-firebase/auth';
 import firestore from '@react-native-firebase/firestore';
@@ -108,7 +108,7 @@ const LoginWithEmail = ({navigation}) => {
                 type="error"
                 style={{
                   alignSelf: 'flex-start',
-                  marginLeft: moderateScale(30),
+                  marginLeft: horizontalScale(30),
                 }}>
                 Email is required.
               </HelperText>
@@ -148,7 +148,7 @@ const LoginWithEmail = ({navigation}) => {
                 type="error"
                 style={{
                   alignSelf: 'flex-start',
-                  marginLeft: moderateScale(30),
+                  marginLeft: horizontalScale(30),
                 }}>
                 Password is required.
               </HelperText>
