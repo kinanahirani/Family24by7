@@ -6,7 +6,7 @@ import {
   ScrollView,
 } from 'react-native';
 import React, {useState} from 'react';
-import {moderateScale} from '../helpers/sizeHelpers';
+import {horizontalScale, moderateScale, verticalScale} from '../helpers/sizeHelpers';
 import {HelperText, TextInput} from 'react-native-paper';
 import {useNavigation} from '@react-navigation/native';
 import {useForm, Controller} from 'react-hook-form';
@@ -75,7 +75,7 @@ const SignupWithEmail = () => {
             <Text
               style={{
                 fontWeight: 'bold',
-                fontSize: 20,
+                fontSize: moderateScale(20),
                 marginTop: moderateScale(40),
                 color: 'black',
               }}>
@@ -84,7 +84,7 @@ const SignupWithEmail = () => {
             <Text
               style={{
                 fontWeight: 'bold',
-                fontSize: 13,
+                fontSize: moderateScale(13),
                 marginTop: moderateScale(12),
                 color: 'black',
               }}>
@@ -94,7 +94,7 @@ const SignupWithEmail = () => {
               style={{
                 marginTop: moderateScale(20),
                 width: '85%',
-                fontSize: 14,
+                fontSize: moderateScale(14),
               }}>
               Since a lot of cildren do not have email to signup, we use
               family360 emails to setup chaildren accounts, please note
@@ -116,7 +116,7 @@ const SignupWithEmail = () => {
                   style={[
                     styles.textInput,
                     {
-                      marginTop: 20,
+                      marginTop: verticalScale(20),
                     },
                   ]}
                 />
@@ -129,6 +129,7 @@ const SignupWithEmail = () => {
                 style={{
                   alignSelf: 'flex-start',
                   marginLeft: horizontalScale(30),
+                  fontSize:moderateScale(12)
                 }}>
                 Name is required.
               </HelperText>
@@ -156,6 +157,7 @@ const SignupWithEmail = () => {
                 style={{
                   alignSelf: 'flex-start',
                   marginLeft: horizontalScale(30),
+                  fontSize:moderateScale(12)
                 }}>
                 Email is required.
               </HelperText>
@@ -167,9 +169,9 @@ const SignupWithEmail = () => {
               alignSelf: 'center',
               marginTop: moderateScale(20),
             }}>
-            <Text>Use this format:</Text>
-            <Text>childname+parentname@lastname+family360.com,</Text>
-            <Text>example KinanaMohammed@Hiranifamily360</Text>
+            <Text style={{fontSize:moderateScale(13)}}>Use this format:</Text>
+            <Text style={{fontSize:moderateScale(13)}}>childname+parentname@lastname+family360.com,</Text>
+            <Text style={{fontSize:moderateScale(13)}}>example KinanaMohammed@Hiranifamily360</Text>
             <Controller
               control={control}
               rules={{
@@ -190,16 +192,16 @@ const SignupWithEmail = () => {
                   onChangeText={onChange}
                   value={value}
                   style={{
-                    marginTop: 20,
+                    marginTop: verticalScale(20),
                     backgroundColor: 'white',
-                    fontSize: 14,
+                    fontSize: moderateScale(14),
                   }}
                 />
               )}
               name="password"
             />
             {errors.password && (
-              <HelperText type="error" style={{alignSelf: 'flex-start'}}>
+              <HelperText type="error" style={{alignSelf: 'flex-start', fontSize:moderateScale(12)}}>
                 Password is required.
               </HelperText>
             )}
@@ -234,8 +236,8 @@ const SignupWithEmail = () => {
           <Text
             style={{
               textAlign: 'center',
-              marginBottom: 5,
-              fontSize: 13,
+              marginBottom: verticalScale(5),
+              fontSize: moderateScale(13),
               width: '85%',
             }}>
             By proceeding further, you agree to our privacy policy and provide
@@ -259,17 +261,18 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     backgroundColor: 'rgba(119,79,251,255)',
-    height: 50,
+    height: verticalScale(50),
     marginBottom: moderateScale(28),
     elevation: 7,
   },
   loginText: {
     color: 'white',
     fontWeight: '500',
+    fontSize:moderateScale(14)
   },
   textInput: {
     width: '85%',
     backgroundColor: 'white',
-    fontSize: 14,
+    fontSize: moderateScale(14),
   },
 });

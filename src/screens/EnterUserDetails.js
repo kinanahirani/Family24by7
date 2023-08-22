@@ -132,7 +132,7 @@ const EnterUserDetails = ({navigation}) => {
           style={{
             marginLeft: 'auto',
             marginRight: 'auto',
-            fontSize: 18,
+            fontSize: moderateScale(18),
             fontWeight: '600',
             color: 'rgba(15, 24, 40, 1)',
           }}>
@@ -244,30 +244,30 @@ const styles = StyleSheet.create({
     right: 0,
     backgroundColor: 'white',
     borderRadius: moderateScale(30),
-    padding: 10,
+    padding: moderateScale(10),
   },
   addIcon: {
-    width: 24,
-    height: 24,
+    width: horizontalScale(24),
+    height: verticalScale(24),
     color: 'black',
   },
   input: {
     backgroundColor: 'transparent',
     height: moderateScale(50),
-    borderRadius: 4,
-    marginBottom: 12,
+    borderRadius: moderateScale(4),
+    marginBottom: verticalScale(12),
   },
   saveButton: {
     width: '85%',
-    height: 52,
+    height: verticalScale(52),
     backgroundColor: 'rgba(119,79,251,255)',
     justifyContent: 'center',
     alignItems: 'center',
-    marginTop: 81,
-    marginHorizontal: 24,
+    marginTop: verticalScale(81),
+    marginHorizontal: horizontalScale(24),
   },
   saveButtonText: {
     color: '#F7F7FC',
-    fontSize: 16,
+    fontSize: moderateScale(16),
   },
 });

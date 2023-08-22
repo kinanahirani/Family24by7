@@ -8,7 +8,11 @@ import {
   Alert,
 } from 'react-native';
 import React, {useState} from 'react';
-import {horizontalScale, moderateScale} from '../helpers/sizeHelpers';
+import {
+  horizontalScale,
+  moderateScale,
+  verticalScale,
+} from '../helpers/sizeHelpers';
 import {TextInput, HelperText} from 'react-native-paper';
 import auth from '@react-native-firebase/auth';
 import firestore from '@react-native-firebase/firestore';
@@ -71,7 +75,7 @@ const LoginWithEmail = ({navigation}) => {
             <Text
               style={{
                 fontWeight: 'bold',
-                fontSize: 20,
+                fontSize: moderateScale(20),
                 marginTop: moderateScale(40),
                 color: 'black',
               }}>
@@ -80,7 +84,7 @@ const LoginWithEmail = ({navigation}) => {
             <Text
               style={{
                 fontWeight: 'bold',
-                fontSize: 13,
+                fontSize: moderateScale(13),
                 marginTop: moderateScale(12),
                 color: 'black',
               }}>
@@ -133,9 +137,9 @@ const LoginWithEmail = ({navigation}) => {
                   onChangeText={onChange}
                   value={value}
                   style={{
-                    marginTop: 20,
+                    marginTop: verticalScale(20),
                     backgroundColor: 'white',
-                    fontSize: 14,
+                    fontSize: moderateScale(14),
                     width: '85%',
                     // marginBottom: moderateScale(40),
                   }}
@@ -198,17 +202,18 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     backgroundColor: 'rgba(119,79,251,255)',
-    height: 50,
+    height: verticalScale(50),
     marginBottom: moderateScale(28),
     elevation: 7,
   },
   loginText: {
     color: 'white',
     fontWeight: '500',
+    fontSize: moderateScale(14),
   },
   textInput: {
     width: '85%',
     backgroundColor: 'white',
-    fontSize: 14,
+    fontSize: moderateScale(14),
   },
 });

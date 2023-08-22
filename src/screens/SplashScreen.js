@@ -9,14 +9,41 @@ const SplashScreen = () => {
   let navigation = useNavigation();
   const userData = useSelector(state => state.user.data);
 
+  // const checkIsFirst = async () => {
+  //   setTimeout(async () => {
+  //     if (userData) {
+  //       navigation.replace('tabbar');
+  //     } else {
+  //       navigation.replace('loginwithemail');
+  //     }
+  //   }, 3000);
+  // };
+
   const checkIsFirst = async () => {
     setTimeout(async () => {
-      if (userData) {
-        navigation.replace('tabbar');
-      } else {
-        navigation.replace('loginwithemail');
+      try {
+        const userPersistedData = await AsyncStorage.getItem('persist:user');
+        if (userPersistedData) {
+          const parsedUserPersistedData = JSON.parse(userPersistedData);
+          if (parsedUserPersistedData.data !== '') {
+            console.log(
+              parsedUserPersistedData.data,
+              'User data found in AsyncStorage',
+            );
+            navigation.replace('tabbar');
+          } else {
+            console.log('User data empty in AsyncStorage');
+            navigation.replace('loginoptions');
+          }
+        } else {
+          console.log('No user data found in AsyncStorage');
+          navigation.replace('loginoptions');
+        }
+      } catch (error) {
+        console.error('Error checking user data in AsyncStorage:', error);
+        // Handle error, show a message to the user, etc.
       }
-    }, 3000);
+    });
   };
 
   useEffect(() => {

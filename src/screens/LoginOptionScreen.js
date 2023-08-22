@@ -11,7 +11,6 @@ import {useNavigation} from '@react-navigation/native';
 
 const LoginOptionScreen = () => {
   const navigation = useNavigation();
-  const [userInfo, setUserInfo] = useState(null);
   useEffect(() => {
     GoogleSignin.configure({
       webClientId:
@@ -19,19 +18,23 @@ const LoginOptionScreen = () => {
     });
   }, []);
 
-  const signIn = async () => {
+  const googleSignIn = async () => {
     try {
-      await GoogleSignin.hasPlayServices();
+      await GoogleSignin.hasPlayServices({showPlayServicesUpdateDialog: true});
       const usrInfo = await GoogleSignin.signIn();
-      console.log(usrInfo, '..usrInfo');
+      console.log(usrInfo, 'usrinfo');
+
       const userDocRef = firestore().collection('users').doc(usrInfo.user.id);
+      console.log(userDocRef, "userDocRef");
       await userDocRef.set({
         email: usrInfo.user.email,
         id: usrInfo.user.id,
         name: usrInfo.user.name,
         photo: usrInfo.user.photo,
       });
-      //   setUserInfo({usrInfo});
+
+      navigation.navigate('map');
+
     } catch (error) {
       if (error.code === statusCodes.SIGN_IN_CANCELLED) {
         // user cancelled the login flow
@@ -82,7 +85,7 @@ const LoginOptionScreen = () => {
         }}>
         <TouchableOpacity
           style={styles.loginButtons}
-          onPress={signIn}
+          onPress={googleSignIn}
           activeOpacity={0.7}>
           <Text style={styles.loginText}>Login With Google</Text>
         </TouchableOpacity>
