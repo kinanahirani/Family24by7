@@ -2,11 +2,12 @@ import {
   ScrollView,
   StyleSheet,
   Text,
-  TouchableHighlight,
   TouchableOpacity,
   View,
+  Modal,
+  Pressable,
 } from 'react-native';
-import React from 'react';
+import React, {useState} from 'react';
 import {
   horizontalScale,
   moderateScale,
@@ -15,8 +16,14 @@ import {
 import AntDesign from 'react-native-vector-icons/AntDesign';
 import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+import {TextInput} from 'react-native-paper';
 
 const SafetyScreen = () => {
+  const [editModalVisible, setEditModalVisible] = useState(false);
+  const [messageTxt, setMessageTxt] = useState(
+    '(Your Name) has sent an emergency alert, reach/contact as soon as you can, the last location we have is in the URL (location URL) at (time)',
+  );
+
   return (
     <>
       <View style={styles.container}>
@@ -95,7 +102,8 @@ const SafetyScreen = () => {
                   style={{
                     alignSelf: 'flex-start',
                     marginLeft: horizontalScale(15),
-                  }}>
+                  }}
+                  onPress={() => setEditModalVisible(true)}>
                   <Text
                     style={{
                       color: 'rgba(119,79,251,255)',
@@ -109,6 +117,52 @@ const SafetyScreen = () => {
             </View>
           </View>
         </View>
+
+        <Modal
+          animationType="fade"
+          transparent={true}
+          visible={editModalVisible}
+          onRequestClose={() => {
+            setEditModalVisible(false);
+          }}>
+          <View style={styles.centeredView}>
+            <View style={styles.modalView}>
+              <TextInput
+                multiline
+                // numberOfLines={4}
+                mode="outlined"
+                label="Emergency Message"
+                style={[styles.textInput, {marginTop: moderateScale(10)}]}
+                onChangeText={text => setMessageTxt(text)}
+                value={messageTxt}
+                error={messageTxt.length > 200}
+              />
+              <View style={{flexDirection: 'row', width: '100%'}}>
+                <Text style={{width: '70%', fontSize: moderateScale(11)}}>
+                  This message will be sent when you tap on send emergency alert
+                  option, your location will be added to the last of your
+                  message.
+                </Text>
+                <Text
+                  style={{
+                    marginLeft: horizontalScale(30),
+                    color: messageTxt.length > 200 ? 'maroon' : 'black',
+                    height: 'auto',
+                  }}>{`${messageTxt.length}/200`}</Text>
+              </View>
+              <View style={{flexDirection: 'row', alignSelf: 'flex-end'}}>
+                <Pressable
+                  style={[styles.button, {marginRight: horizontalScale(10)}]}
+                  onPress={() => setEditModalVisible(false)}>
+                  <Text style={styles.textStyle}>BACK</Text>
+                </Pressable>
+                <Pressable style={styles.button}>
+                  <Text style={styles.textStyle}>CREATE</Text>
+                </Pressable>
+              </View>
+            </View>
+          </View>
+        </Modal>
       </View>
 
       <View style={styles.bottomView}>
@@ -161,6 +215,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     padding: moderateScale(15),
     borderBottomWidth: 0.3,
+    borderColor: 'rgba(128,128,128,0.4)',
   },
   headerTxt: {
     fontSize: moderateScale(15),
@@ -203,5 +258,40 @@ const styles = StyleSheet.create({
     color: 'white',
     fontSize: moderateScale(17),
     fontWeight: '500',
+  },
+  centeredView: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+  },
+  modalView: {
+    backgroundColor: 'white',
+    borderRadius: moderateScale(7),
+    padding: moderateScale(25),
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    elevation: 5,
+    width: '85%',
+  },
+  button: {
+    padding: moderateScale(10),
+    width: horizontalScale(80),
+  },
+  textStyle: {
+    color: 'rgba(119,79,251,255)',
+    textAlign: 'center',
+  },
+  textInput: {
+    width: '100%',
+    color: 'black',
+    marginBottom: verticalScale(5),
+    fontSize: moderateScale(14),
+    backgroundColor: 'white',
   },
 });

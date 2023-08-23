@@ -22,10 +22,10 @@ export default AppNavigator = () => {
       <Stack.Screen name="signupwithemail" component={SignupWithEmail} />
       <Stack.Screen name="loginwithemail" component={LoginWithEmail} />
       <Stack.Screen name="enteruserdetails" component={EnterUserDetails} />
+      <Stack.Screen name="drawer" component={DrawerNavigator} />
       <Stack.Screen name="tabbar" component={TabBar} />
       <Stack.Screen name="createcircle" component={CreateCircleScreen} />
       <Stack.Screen name="map" component={MapScreen} />
-      <Stack.Screen name="drawer" component={DrawerNavigator} />
     </Stack.Navigator>
   );
 };

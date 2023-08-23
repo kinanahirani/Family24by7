@@ -6,6 +6,7 @@ import {
   TextInput,
   View,
   TouchableOpacity,
+  FlatList,
 } from 'react-native';
 import React, {useState} from 'react';
 import {
@@ -19,28 +20,122 @@ import {useNavigation} from '@react-navigation/native';
 import store from '../redux/store';
 import {persistStore} from 'redux-persist';
 import auth from '@react-native-firebase/auth';
+import AntDesign from 'react-native-vector-icons/AntDesign';
 
 const MenuScreen = () => {
   const dispatch = useDispatch();
   const navigation = useNavigation();
-  const [createCircleModalVisible, setCreateCircleModalVisible] = useState(false);
+  const [createCircleModalVisible, setCreateCircleModalVisible] =
+    useState(false);
 
   const handleLogout = async () => {
     dispatch(setUserData(''));
     await persistStore(store).purge();
-    await auth().signOut()
+    await auth().signOut();
     setCreateCircleModalVisible(false);
     navigation.replace('loginoptions');
   };
 
+  const data = [
+    {
+      text: '+ Add a New Member',
+      onPress: () => {
+        alert('Add a new member');
+      },
+    },
+    {
+      text: 'My Current Circle',
+      onPress: () => {
+        alert('My current circle');
+      },
+    },
+    {
+      text: 'My Profile',
+      onPress: () => {
+        alert('My profile');
+      },
+    },
+    {
+      text: 'My Circles',
+      onPress: () => {
+        alert('My circles');
+      },
+    },
+    {
+      text: 'Manage Premium',
+      onPress: () => {
+        alert('Manage premium');
+      },
+    },
+    {
+      text: 'General Settings',
+      onPress: () => {
+        alert('General settings');
+      },
+    },
+    {
+      text: 'Help & Support',
+      onPress: () => {
+        alert('Help & support');
+      },
+    },
+    {
+      text: 'Delete all data',
+      onPress: () => {
+        alert('Delete all data');
+      },
+    },
+    {
+      text: 'Logout',
+      onPress: () => {
+        setCreateCircleModalVisible(true);
+      },
+    },
+  ];
+
+  const renderItem = ({item}) => {
+    return (
+      <TouchableOpacity activeOpacity={0.8} onPress={item.onPress}>
+        <View
+          style={{
+            flexDirection: 'row',
+            padding: moderateScale(15),
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            borderBottomWidth: 0.3,
+            borderColor: 'rgba(128,128,128,0.4)',
+          }}>
+          <Text
+            style={{
+              color: item.text === '+ Add a New Member' ? 'rgba(119, 79, 251, 255)' : 'black',
+              fontSize: moderateScale(14),
+              fontWeight: 'bold',
+            }}>
+            {item.text}
+          </Text>
+          <AntDesign
+            name="right"
+            color={'black'}
+            size={20}
+            style={{alignSelf: 'flex-start'}}
+          />
+        </View>
+      </TouchableOpacity>
+    );
+  };
   return (
     <View style={styles.container}>
       <View style={styles.header}>
         <Text style={styles.headerTxt}>Menu</Text>
       </View>
-      <TouchableOpacity onPress={() => setCreateCircleModalVisible(true)}>
-        <Text>Logout</Text>
-      </TouchableOpacity>
+
+      <FlatList
+        data={data}
+        renderItem={renderItem}
+        onPress={({item}) => item.onPress()}
+      />
+
+      {/* Logout Modal */}
       <Modal
         animationType="fade"
         transparent={true}
@@ -83,6 +178,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     padding: moderateScale(15),
     borderBottomWidth: 0.3,
+    borderColor: 'rgba(128,128,128,0.4)',
   },
   headerTxt: {
     fontSize: moderateScale(15),
@@ -123,3 +219,32 @@ const styles = StyleSheet.create({
     color: 'black',
   },
 });
+
+{
+  /* <TouchableOpacity activeOpacity={1}>
+        <View
+          style={{
+            flexDirection: 'row',
+            padding: moderateScale(15),
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            borderBottomWidth: 0.3,
+            borderColor: 'rgba(128,128,128,0.4)',
+          }}>
+          <Text
+            style={{
+              color: 'rgba(119,79,251,255)',
+              fontSize: moderateScale(14),
+              fontWeight: 'bold',
+            }}>
+            + Add a New Member
+          </Text>
+          <AntDesign
+            name="right"
+            color={'black'}
+            size={20}
+            style={{alignSelf: 'flex-start'}}
+          />
+        </View>
+      </TouchableOpacity> */
+}

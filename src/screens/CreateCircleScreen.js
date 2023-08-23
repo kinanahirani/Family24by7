@@ -89,7 +89,7 @@ const CreateCircleScreen = () => {
               marginTop: verticalScale(50),
             }}>
             <View style={{flex: 1, height: 1, backgroundColor: 'black'}} />
-            <Text style={{marginHorizontal: 7, fontSize: 20}}>OR</Text>
+            <Text style={{marginHorizontal: horizontalScale(7), fontSize: moderateScale(20)}}>OR</Text>
             <View style={{flex: 1, height: 1, backgroundColor: 'black'}} />
           </View>
         </View>
@@ -111,7 +111,7 @@ const CreateCircleScreen = () => {
             style={[styles.createBtn, {marginTop: moderateScale(30)}]}
             activeOpacity={0.7}
             onPress={() => setCreateCircleModalVisible(true)}>
-            <Text style={{color: 'white', fontWeight: 400}}>Create Circle</Text>
+            <Text style={{color: 'white', fontWeight: '400'}}>Create Circle</Text>
           </TouchableOpacity>
           <Text>We will give you a code to share</Text>
         </View>
@@ -170,7 +170,7 @@ const styles = StyleSheet.create({
     width: horizontalScale(48),
     height: verticalScale(48),
     textAlign: 'center',
-    fontSize: 24,
+    fontSize: moderateScale(24),
     borderWidth: 2,
     color: 'black',
   },
@@ -179,8 +179,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     backgroundColor: 'rgba(119,79,251,255)',
-    height: 50,
-    borderRadius: 30,
+    height: verticalScale(50),
+    borderRadius: moderateScale(30),
     marginBottom: moderateScale(20),
     elevation: 7,
   },
@@ -192,8 +192,8 @@ const styles = StyleSheet.create({
   },
   modalView: {
     backgroundColor: 'white',
-    borderRadius: 7,
-    padding: 25,
+    borderRadius: moderateScale(7),
+    padding: moderateScale(25),
     shadowColor: '#000',
     shadowOffset: {
       width: 0,
@@ -205,7 +205,7 @@ const styles = StyleSheet.create({
     width: '85%',
   },
   button: {
-    padding: 10,
+    padding: moderateScale(10),
     width: horizontalScale(80),
   },
   textStyle: {
@@ -213,7 +213,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   modalText: {
-    fontSize: 16,
+    fontSize: moderateScale(16),
     fontWeight: '500',
     color: 'black',
   },
@@ -221,7 +221,7 @@ const styles = StyleSheet.create({
     width: '100%',
     color: 'black',
     marginBottom: verticalScale(20),
-    fontSize: 14,
+    fontSize: moderateScale(14),
     borderBottomWidth: 1,
     borderBottomColor: 'rgba(119,79,251,1)',
   },

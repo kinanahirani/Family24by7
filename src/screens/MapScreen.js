@@ -67,7 +67,7 @@ const MapScreen = () => {
   const bottomSheetRef = useRef(null);
   const snapPoints = useMemo(() => ['4%', '25%', '43%'], []);
   const openDrawer = () => {
-    navigation.dispatch(DrawerActions.toggleDrawer());
+    navigation.dispatch(DrawerActions.openDrawer());
   };
 
   const handleSheetChanges = useCallback(index => {
@@ -198,50 +198,12 @@ const MapScreen = () => {
             showsHorizontalScrollIndicator={false}
             contentContainerStyle={{
               flexDirection: 'row',
-              width: 'auto',
-              height: '100%',
+              justifyContent: 'center',
+              paddingHorizontal: horizontalScale(10),
             }}>
             <View
               style={{
-                width: '40%',
-                height: '45%',
-                marginHorizontal: horizontalScale(10),
-                elevation: 7,
-                shadowColor: 'black',
-                shadowOffset: {width: 0, height: 2},
-                shadowOpacity: 0.3,
-                shadowRadius: 4,
-                borderTopRightRadius: moderateScale(8),
-                borderTopLeftRadius: moderateScale(8),
-                backgroundColor: 'white',
-              }}>
-              <Text
-                style={{
-                  color: 'black',
-                  fontSize: moderateScale(12),
-                  padding: moderateScale(10),
-                }}>
-                Get notified when family leaves/enters school, office etc.
-              </Text>
-              <TouchableOpacity
-                activeOpacity={0.7}
-                style={{
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  backgroundColor: 'black',
-                  padding: moderateScale(10),
-                  borderBottomRightRadius: moderateScale(8),
-                  borderBottomLeftRadius: moderateScale(8),
-                }}>
-                <Text style={{color: 'white', fontSize: moderateScale(13)}}>
-                  + Add Places
-                </Text>
-              </TouchableOpacity>
-            </View>
-
-            <View
-              style={{
-                width: '40%',
+                width:horizontalScale(250),
                 height: '45%',
                 marginRight: horizontalScale(10),
                 elevation: 7,
@@ -256,7 +218,46 @@ const MapScreen = () => {
               <Text
                 style={{
                   color: 'black',
-                  fontSize: moderateScale(12),
+                  fontSize: moderateScale(14),
+                  padding: moderateScale(10),
+                }}>
+                Get notified when family leaves/enters school, office etc.
+              </Text>
+              <TouchableOpacity
+                activeOpacity={0.7}
+                style={{
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  backgroundColor: 'black',
+                  padding: moderateScale(10),
+                  borderBottomRightRadius: moderateScale(8),
+                  borderBottomLeftRadius: moderateScale(8),
+                  height:verticalScale(45)
+                }}>
+                <Text style={{color: 'white', fontSize: moderateScale(13)}}>
+                  + Add Places
+                </Text>
+              </TouchableOpacity>
+            </View>
+
+            <View
+              style={{
+                width:horizontalScale(250),
+                height: '45%',
+                marginRight: horizontalScale(10),
+                elevation: 7,
+                shadowColor: 'black',
+                shadowOffset: {width: 0, height: 2},
+                shadowOpacity: 0.3,
+                shadowRadius: 4,
+                borderTopRightRadius: moderateScale(8),
+                borderTopLeftRadius: moderateScale(8),
+                backgroundColor: 'white',
+              }}>
+              <Text
+                style={{
+                  color: 'black',
+                  fontSize: moderateScale(14),
                   padding: moderateScale(10),
                 }}>
                 Get notified when family members cross speed limit
@@ -270,6 +271,7 @@ const MapScreen = () => {
                   padding: moderateScale(10),
                   borderBottomRightRadius: moderateScale(8),
                   borderBottomLeftRadius: moderateScale(8),
+                  height:verticalScale(45)
                 }}>
                 <Text style={{color: 'white', fontSize: moderateScale(13)}}>
                   Set speed alert

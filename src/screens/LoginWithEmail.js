@@ -55,7 +55,8 @@ const LoginWithEmail = ({navigation}) => {
         if (userDoc.exists) {
           const userData = userDoc.data();
           dispatch(setUserData(userData));
-          navigation.replace('enteruserdetails');
+          navigation.replace('tabbar');
+          // navigation.replace('enteruserdetails');
           // navigation.replace('createcircle');
         } else {
           Alert.alert('User not found!');
