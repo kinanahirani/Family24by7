@@ -25,16 +25,15 @@ const LoginOptionScreen = () => {
       console.log(usrInfo, 'usrinfo');
 
       const userDocRef = firestore().collection('users').doc(usrInfo.user.id);
-      console.log(userDocRef, "userDocRef");
+      console.log(userDocRef, 'userDocRef');
       await userDocRef.set({
         email: usrInfo.user.email,
         id: usrInfo.user.id,
         name: usrInfo.user.name,
         photo: usrInfo.user.photo,
       });
-
-      navigation.navigate('map');
-
+      navigation.replace('tabbar');
+      
     } catch (error) {
       if (error.code === statusCodes.SIGN_IN_CANCELLED) {
         // user cancelled the login flow
@@ -61,7 +60,7 @@ const LoginOptionScreen = () => {
         <Text
           style={{
             fontWeight: 'bold',
-            fontSize: 20,
+            fontSize: moderateScale(20),
             marginTop: moderateScale(30),
             color: 'black',
           }}>
@@ -70,7 +69,7 @@ const LoginOptionScreen = () => {
         <Text
           style={{
             fontWeight: 'bold',
-            fontSize: 13,
+            fontSize: moderateScale(13),
             marginTop: moderateScale(12),
             color: 'black',
           }}>
@@ -98,7 +97,12 @@ const LoginOptionScreen = () => {
           onPress={() => navigation.navigate('signupwithemail')}>
           <Text style={styles.loginText}>Email Login or Child Account</Text>
         </TouchableOpacity>
-        <Text style={{textAlign: 'center', marginBottom: 5, fontSize: 13}}>
+        <Text
+          style={{
+            textAlign: 'center',
+            marginBottom: verticalScale(5),
+            fontSize: moderateScale(13),
+          }}>
           By proceeding further, you agree to our privacy policy and provide
           your consent.
         </Text>
@@ -119,7 +123,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     backgroundColor: 'rgba(119,79,251,255)',
-    height: 50,
+    height: verticalScale(50),
     marginBottom: moderateScale(28),
     elevation: 7,
   },

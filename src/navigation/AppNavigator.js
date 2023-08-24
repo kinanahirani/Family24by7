@@ -9,6 +9,8 @@ import EnterUserDetails from '../screens/EnterUserDetails';
 import CreateCircleScreen from '../screens/CreateCircleScreen';
 import MapScreen from '../screens/MapScreen';
 import DrawerNavigator from './DrawerNavigator';
+import SendAlertScreen from '../screens/SendAlertScreen';
+import WatchOverMeScreen from '../screens/WatchOverMeScreen';
 
 const Stack = createNativeStackNavigator();
 
@@ -26,6 +28,8 @@ export default AppNavigator = () => {
       <Stack.Screen name="tabbar" component={TabBar} />
       <Stack.Screen name="createcircle" component={CreateCircleScreen} />
       <Stack.Screen name="map" component={MapScreen} />
+      <Stack.Screen name="sendAlert" component={SendAlertScreen} />
+      <Stack.Screen name="WatchOverMe" component={WatchOverMeScreen} />
     </Stack.Navigator>
   );
 };

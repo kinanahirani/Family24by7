@@ -107,7 +107,10 @@ const MenuScreen = () => {
           }}>
           <Text
             style={{
-              color: item.text === '+ Add a New Member' ? 'rgba(119, 79, 251, 255)' : 'black',
+              color:
+                item.text === '+ Add a New Member'
+                  ? 'rgba(119, 79, 251, 255)'
+                  : 'black',
               fontSize: moderateScale(14),
               fontWeight: 'bold',
             }}>

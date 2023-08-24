@@ -104,6 +104,7 @@ const LoginWithEmail = ({navigation}) => {
                   onBlur={onBlur}
                   onChangeText={onChange}
                   value={value}
+                  error={errors.email}
                 />
               )}
               name="email"
@@ -144,6 +145,7 @@ const LoginWithEmail = ({navigation}) => {
                     width: '85%',
                     // marginBottom: moderateScale(40),
                   }}
+                  error={errors.password}
                 />
               )}
               name="password"

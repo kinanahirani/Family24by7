@@ -39,6 +39,7 @@ const TabBar = () => {
               style={{
                 marginBottom: verticalScale(7),
                 color: focused ? 'rgba(119,79,251,255)' : 'grey',
+                fontSize:moderateScale(14)
               }}>
               Map
             </Text>
@@ -69,6 +70,7 @@ const TabBar = () => {
               style={{
                 marginBottom: verticalScale(7),
                 color: focused ? 'rgba(119,79,251,255)' : 'grey',
+                fontSize:moderateScale(14)
               }}>
               Safety
             </Text>
@@ -103,6 +105,7 @@ const TabBar = () => {
               style={{
                 marginBottom: verticalScale(7),
                 color: focused ? 'rgba(119,79,251,255)' : 'grey',
+                fontSize:moderateScale(14)
               }}>
               Places
             </Text>
@@ -137,6 +140,7 @@ const TabBar = () => {
               style={{
                 marginBottom: verticalScale(7),
                 color: focused ? 'rgba(119,79,251,255)' : 'grey',
+                fontSize:moderateScale(14)
               }}>
               Menu
             </Text>

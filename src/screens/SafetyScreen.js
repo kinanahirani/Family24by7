@@ -17,12 +17,14 @@ import AntDesign from 'react-native-vector-icons/AntDesign';
 import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import {TextInput} from 'react-native-paper';
+import {useNavigation} from '@react-navigation/native';
 
 const SafetyScreen = () => {
+  const defaultMessage =
+    '(Your Name) has sent an emergency alert, reach/contact as soon as you can, the last location we have is in the URL (location URL) at (time)';
+  const navigation = useNavigation();
   const [editModalVisible, setEditModalVisible] = useState(false);
-  const [messageTxt, setMessageTxt] = useState(
-    '(Your Name) has sent an emergency alert, reach/contact as soon as you can, the last location we have is in the URL (location URL) at (time)',
-  );
+  const [messageTxt, setMessageTxt] = useState(defaultMessage);
 
   return (
     <>
@@ -94,9 +96,7 @@ const SafetyScreen = () => {
                     marginBottom: verticalScale(15),
                     width: '80%',
                   }}>
-                  (Your Name) has sent an emergency alert, reach/contact as soon
-                  as you can, the last location we have is in the URL (location
-                  URL) at (time)
+                  {messageTxt}
                 </Text>
                 <TouchableOpacity
                   style={{
@@ -148,17 +148,32 @@ const SafetyScreen = () => {
                     marginLeft: horizontalScale(30),
                     color: messageTxt.length > 200 ? 'maroon' : 'black',
                     height: 'auto',
+                    fontSize: moderateScale(13),
                   }}>{`${messageTxt.length}/200`}</Text>
               </View>
-              <View style={{flexDirection: 'row', alignSelf: 'flex-end'}}>
-                <Pressable
-                  style={[styles.button, {marginRight: horizontalScale(10)}]}
-                  onPress={() => setEditModalVisible(false)}>
-                  <Text style={styles.textStyle}>BACK</Text>
-                </Pressable>
-                <Pressable style={styles.button}>
-                  <Text style={styles.textStyle}>CREATE</Text>
-                </Pressable>
+              <View
+                style={{
+                  flexDirection: 'row',
+                  marginTop: verticalScale(30),
+                  justifyContent: 'space-between',
+                }}>
+                <View>
+                  <Pressable
+                    style={[styles.button, {marginRight: horizontalScale(10)}]}
+                    onPress={() => setMessageTxt(defaultMessage)}>
+                    <Text style={styles.textStyle}>DEFAULT</Text>
+                  </Pressable>
+                </View>
+                <View style={{flexDirection: 'row'}}>
+                  <Pressable
+                    style={[styles.button]}
+                    onPress={() => setEditModalVisible(false)}>
+                    <Text style={styles.textStyle}>DISMISS</Text>
+                  </Pressable>
+                  <Pressable style={styles.button}>
+                    <Text style={styles.textStyle}>SAVE</Text>
+                  </Pressable>
+                </View>
               </View>
             </View>
           </View>
@@ -166,7 +181,10 @@ const SafetyScreen = () => {
       </View>
 
       <View style={styles.bottomView}>
-        <View style={[styles.box, {backgroundColor: 'orange'}]}>
+        <TouchableOpacity
+          style={[styles.box, {backgroundColor: 'orange'}]}
+          activeOpacity={1}
+          onPress={() => navigation.navigate('WatchOverMe')}>
           <FontAwesome5
             name="walking"
             size={moderateScale(80)}
@@ -181,8 +199,10 @@ const SafetyScreen = () => {
             }}>
             Watch Over Me
           </Text>
-        </View>
-        <View
+        </TouchableOpacity>
+        <TouchableOpacity
+          activeOpacity={1}
+          onPress={() => navigation.navigate('sendAlert')}
           style={[
             styles.box,
             {backgroundColor: 'rgb(204,0,0)', marginLeft: horizontalScale(10)},
@@ -196,7 +216,7 @@ const SafetyScreen = () => {
           <Text style={styles.boxTxt}>Send</Text>
           <Text style={styles.boxTxt}>Emergency</Text>
           <Text style={styles.boxTxt}>Alert</Text>
-        </View>
+        </TouchableOpacity>
       </View>
     </>
   );
@@ -268,7 +288,8 @@ const styles = StyleSheet.create({
   modalView: {
     backgroundColor: 'white',
     borderRadius: moderateScale(7),
-    padding: moderateScale(25),
+    paddingHorizontal: horizontalScale(15),
+    paddingTop: verticalScale(10),
     shadowColor: '#000',
     shadowOffset: {
       width: 0,
@@ -281,7 +302,8 @@ const styles = StyleSheet.create({
   },
   button: {
     padding: moderateScale(10),
-    width: horizontalScale(80),
+    // width: horizontalScale(80),
+    // backgroundColor:'green'
   },
   textStyle: {
     color: 'rgba(119,79,251,255)',

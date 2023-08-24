@@ -203,7 +203,7 @@ const MapScreen = () => {
             }}>
             <View
               style={{
-                width:horizontalScale(250),
+                width: horizontalScale(250),
                 height: '45%',
                 marginRight: horizontalScale(10),
                 elevation: 7,
@@ -215,14 +215,22 @@ const MapScreen = () => {
                 borderTopLeftRadius: moderateScale(8),
                 backgroundColor: 'white',
               }}>
-              <Text
+              <View
                 style={{
-                  color: 'black',
-                  fontSize: moderateScale(14),
-                  padding: moderateScale(10),
+                  height: verticalScale(52),
+                  // backgroundColor: 'red',
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  padding: moderateScale(7),
                 }}>
-                Get notified when family leaves/enters school, office etc.
-              </Text>
+                <Text
+                  style={{
+                    color: 'black',
+                    fontSize: moderateScale(14),
+                  }}>
+                  Get notified when family leaves/enters school, office etc.
+                </Text>
+              </View>
               <TouchableOpacity
                 activeOpacity={0.7}
                 style={{
@@ -232,7 +240,7 @@ const MapScreen = () => {
                   padding: moderateScale(10),
                   borderBottomRightRadius: moderateScale(8),
                   borderBottomLeftRadius: moderateScale(8),
-                  height:verticalScale(45)
+                  height: verticalScale(45),
                 }}>
                 <Text style={{color: 'white', fontSize: moderateScale(13)}}>
                   + Add Places
@@ -242,7 +250,7 @@ const MapScreen = () => {
 
             <View
               style={{
-                width:horizontalScale(250),
+                width: horizontalScale(250),
                 height: '45%',
                 marginRight: horizontalScale(10),
                 elevation: 7,
@@ -254,14 +262,21 @@ const MapScreen = () => {
                 borderTopLeftRadius: moderateScale(8),
                 backgroundColor: 'white',
               }}>
-              <Text
+              <View
                 style={{
-                  color: 'black',
-                  fontSize: moderateScale(14),
-                  padding: moderateScale(10),
+                  height: verticalScale(50),
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  padding: moderateScale(7),
                 }}>
-                Get notified when family members cross speed limit
-              </Text>
+                <Text
+                  style={{
+                    color: 'black',
+                    fontSize: moderateScale(14),
+                  }}>
+                  Get notified when family members cross speed limit
+                </Text>
+              </View>
               <TouchableOpacity
                 activeOpacity={0.7}
                 style={{
@@ -271,7 +286,7 @@ const MapScreen = () => {
                   padding: moderateScale(10),
                   borderBottomRightRadius: moderateScale(8),
                   borderBottomLeftRadius: moderateScale(8),
-                  height:verticalScale(45)
+                  height: verticalScale(45),
                 }}>
                 <Text style={{color: 'white', fontSize: moderateScale(13)}}>
                   Set speed alert

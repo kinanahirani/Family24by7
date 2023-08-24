@@ -60,12 +60,12 @@ const SpeedLimitScreen = () => {
               Kinana Hirani
             </Text>
           </View>
-          <Switch
-            trackColor={{false: '#767577', true: 'rgba(119,79,251,0.4)'}}
-            thumbColor={isEnabled ? 'rgba(119,79,251,255)' : '#f4f3f4'}
-            onValueChange={toggleSwitch}
-            value={isEnabled}
-          />
+            <Switch
+              trackColor={{false: '#767577', true: 'rgba(119,79,251,0.4)'}}
+              thumbColor={isEnabled ? 'rgba(119,79,251,255)' : '#f4f3f4'}
+              onValueChange={toggleSwitch}
+              value={isEnabled}
+            />
         </View>
       </View>
     </ScrollView>

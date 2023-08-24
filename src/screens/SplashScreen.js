@@ -9,47 +9,15 @@ const SplashScreen = () => {
   let navigation = useNavigation();
   const userData = useSelector(state => state.user.data);
 
-  // const checkIsFirst = async () => {
-  //   setTimeout(async () => {
-  //     if (userData) {
-  //       navigation.replace('tabbar');
-  //     } else {
-  //       navigation.replace('loginwithemail');
-  //     }
-  //   }, 3000);
-  // };
-
-  const checkIsFirst = async () => {
-    setTimeout(async () => {
-      try {
-        const userPersistedData = await AsyncStorage.getItem('persist:user');
-        if (userPersistedData) {
-          const parsedUserPersistedData = JSON.parse(userPersistedData);
-          if (parsedUserPersistedData.data !== '') {
-            console.log(
-              parsedUserPersistedData.data,
-              'User data found in AsyncStorage',
-            );
-            navigation.replace('tabbar');
-          } else {
-            console.log('User data empty in AsyncStorage');
-            navigation.replace('loginoptions');
-          }
-        } else {
-          console.log('No user data found in AsyncStorage');
-          navigation.replace('loginoptions');
-        }
-      } catch (error) {
-        console.error('Error checking user data in AsyncStorage:', error);
-        // Handle error, show a message to the user, etc.
-      }
-    });
-  };
-
-  useEffect(() => {
-    checkIsFirst();
-    return checkIsFirst;
-  }, []);
+  useEffect(()=>{
+    setTimeout(() => {
+    if (userData && userData.name) {
+      navigation.replace('tabbar');
+    } else {
+      navigation.replace('loginoptions');
+    }
+  },1000)
+  }, [userData, navigation]);
 
   return (
     <View style={styles.container}>
