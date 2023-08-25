@@ -6,15 +6,22 @@ import {
   ScrollView,
 } from 'react-native';
 import React, {useState} from 'react';
-import {horizontalScale, moderateScale, verticalScale} from '../helpers/sizeHelpers';
+import {
+  horizontalScale,
+  moderateScale,
+  verticalScale,
+} from '../helpers/sizeHelpers';
 import {HelperText, TextInput} from 'react-native-paper';
 import {useNavigation} from '@react-navigation/native';
 import {useForm, Controller} from 'react-hook-form';
 import auth from '@react-native-firebase/auth';
 import firestore from '@react-native-firebase/firestore';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import {setUserData} from '../redux/slices/userSlice';
+import {useDispatch} from 'react-redux';
 
 const SignupWithEmail = () => {
+  const dispatch = useDispatch();
   const {
     control,
     handleSubmit,
@@ -51,8 +58,16 @@ const SignupWithEmail = () => {
             password,
             //   token: token,
           });
+          const userData = {
+            email,
+            id,
+            name,
+            password,
+          };
+
+          dispatch(setUserData(userData));
           console.log('user created');
-          navigation.navigate('loginwithemail');
+          navigation.navigate('createcircle');
         }
       }
     } catch (error) {
@@ -129,7 +144,7 @@ const SignupWithEmail = () => {
                 style={{
                   alignSelf: 'flex-start',
                   marginLeft: horizontalScale(30),
-                  fontSize:moderateScale(12)
+                  fontSize: moderateScale(12),
                 }}>
                 Name is required.
               </HelperText>
@@ -157,7 +172,7 @@ const SignupWithEmail = () => {
                 style={{
                   alignSelf: 'flex-start',
                   marginLeft: horizontalScale(30),
-                  fontSize:moderateScale(12)
+                  fontSize: moderateScale(12),
                 }}>
                 Email is required.
               </HelperText>
@@ -169,9 +184,13 @@ const SignupWithEmail = () => {
               alignSelf: 'center',
               marginTop: moderateScale(20),
             }}>
-            <Text style={{fontSize:moderateScale(13)}}>Use this format:</Text>
-            <Text style={{fontSize:moderateScale(13)}}>childname+parentname@lastname+family360.com,</Text>
-            <Text style={{fontSize:moderateScale(13)}}>example KinanaMohammed@Hiranifamily360</Text>
+            <Text style={{fontSize: moderateScale(13)}}>Use this format:</Text>
+            <Text style={{fontSize: moderateScale(13)}}>
+              childname+parentname@lastname+family360.com,
+            </Text>
+            <Text style={{fontSize: moderateScale(13)}}>
+              example KinanaMohammed@Hiranifamily360
+            </Text>
             <Controller
               control={control}
               rules={{
@@ -201,7 +220,9 @@ const SignupWithEmail = () => {
               name="password"
             />
             {errors.password && (
-              <HelperText type="error" style={{alignSelf: 'flex-start', fontSize:moderateScale(12)}}>
+              <HelperText
+                type="error"
+                style={{alignSelf: 'flex-start', fontSize: moderateScale(12)}}>
                 Password is required.
               </HelperText>
             )}
@@ -268,7 +289,7 @@ const styles = StyleSheet.create({
   loginText: {
     color: 'white',
     fontWeight: '500',
-    fontSize:moderateScale(14)
+    fontSize: moderateScale(14),
   },
   textInput: {
     width: '85%',

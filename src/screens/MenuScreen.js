@@ -40,7 +40,7 @@ const MenuScreen = () => {
     {
       text: '+ Add a New Member',
       onPress: () => {
-        alert('Add a new member');
+        navigation.navigate('ShareCircleCode');
       },
     },
     {
@@ -52,7 +52,7 @@ const MenuScreen = () => {
     {
       text: 'My Profile',
       onPress: () => {
-        alert('My profile');
+        navigation.navigate('enteruserdetails');
       },
     },
     {
@@ -132,11 +132,7 @@ const MenuScreen = () => {
         <Text style={styles.headerTxt}>Menu</Text>
       </View>
 
-      <FlatList
-        data={data}
-        renderItem={renderItem}
-        onPress={({item}) => item.onPress()}
-      />
+      <FlatList data={data} renderItem={renderItem} />
 
       {/* Logout Modal */}
       <Modal
@@ -151,9 +147,9 @@ const MenuScreen = () => {
             <Text style={styles.modalText}>
               Are you sure you want to logout?
             </Text>
-            <View style={{flexDirection: 'row', alignSelf: 'flex-end'}}>
+            <View style={{flexDirection: 'row', alignSelf: 'flex-end', marginTop:verticalScale(20)}}>
               <Pressable
-                style={[styles.button, {marginRight: horizontalScale(10)}]}
+                style={[styles.button]}
                 onPress={() => setCreateCircleModalVisible(false)}>
                 <Text style={styles.textStyle}>NO</Text>
               </Pressable>
@@ -196,20 +192,20 @@ const styles = StyleSheet.create({
   },
   modalView: {
     backgroundColor: 'white',
-    borderRadius: 7,
-    padding: 25,
+    borderRadius: moderateScale(7),
+    paddingTop: verticalScale(15),
     shadowColor: '#000',
     shadowOffset: {
       width: 0,
       height: 2,
     },
     shadowOpacity: 0.25,
-    shadowRadius: 4,
+    shadowRadius: moderateScale(4),
     elevation: 5,
     width: '85%',
   },
   button: {
-    padding: 10,
+    padding: moderateScale(10),
     width: horizontalScale(80),
   },
   textStyle: {
@@ -217,9 +213,10 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   modalText: {
-    fontSize: 16,
+    fontSize: moderateScale(16),
     fontWeight: '500',
     color: 'black',
+    textAlign:'center'
   },
 });
 

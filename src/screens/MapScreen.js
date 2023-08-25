@@ -174,6 +174,7 @@ const MapScreen = () => {
             </View>
           </View>
           <TouchableOpacity
+            onPress={() => navigation.navigate('ShareCircleCode')}
             style={{
               flexDirection: 'row',
               justifyContent: 'center',

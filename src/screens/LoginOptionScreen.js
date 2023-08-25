@@ -33,7 +33,6 @@ const LoginOptionScreen = () => {
         photo: usrInfo.user.photo,
       });
       navigation.replace('tabbar');
-      
     } catch (error) {
       if (error.code === statusCodes.SIGN_IN_CANCELLED) {
         // user cancelled the login flow
@@ -130,5 +129,6 @@ const styles = StyleSheet.create({
   loginText: {
     color: 'white',
     fontWeight: '500',
+    fontSize:moderateScale(14)
   },
 });

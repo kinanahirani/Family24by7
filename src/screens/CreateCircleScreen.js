@@ -14,12 +14,33 @@ import {
   moderateScale,
   verticalScale,
 } from '../helpers/sizeHelpers';
+import firestore from '@react-native-firebase/firestore';
+import {Controller, useForm} from 'react-hook-form';
+import {useSelector} from 'react-redux';
+import {HelperText} from 'react-native-paper';
+import {
+  generateUniqueCircleCode,
+  isCircleCodeUnique,
+} from '../helpers/circleHelpers';
 
 const CreateCircleScreen = () => {
-  const [createCircleCode, setCreateCircleCode] = useState('');
   const [code, setCode] = useState(['', '', '', '', '', '']);
   const codeInputRefs = useRef([]);
-  const [createCircleModalVisible, setCreateCircleModalVisible] = useState(false);
+  const [createCircleModalVisible, setCreateCircleModalVisible] =
+    useState(false);
+
+  const userData = useSelector(state => state.user.data);
+
+  const {
+    control,
+    handleSubmit,
+    getValues,
+    formState: {errors, isValid},
+  } = useForm({
+    defaultValues: {
+      circleName: '',
+    },
+  });
 
   const handleCodeChange = (index, value) => {
     if (value === '') {
@@ -40,6 +61,26 @@ const CreateCircleScreen = () => {
       codeInputRefs.current[index + 1].focus();
     }
     setCode([...code]);
+  };
+
+  const handleCreateCircle = async data => {
+    const circleName = data.circleName;
+    try {
+      const circlesRef = firestore().collection('circles');
+      const circleCode = await generateUniqueCircleCode(circlesRef);
+
+      const circle = await circlesRef.add({
+        circleName,
+        createdBy: userData.name,
+        createdUserId: userData.id,
+        usersOfCircles: [userData.id],
+        circleCode: circleCode,
+        createdAt:firestore.FieldValue.serverTimestamp()
+      });
+      console.log('Circle added with code:', circleCode);
+    } catch (error) {
+      console.error('Error adding circle:', error);
+    }
   };
   return (
     <View style={styles.container}>
@@ -89,7 +130,13 @@ const CreateCircleScreen = () => {
               marginTop: verticalScale(50),
             }}>
             <View style={{flex: 1, height: 1, backgroundColor: 'black'}} />
-            <Text style={{marginHorizontal: horizontalScale(7), fontSize: moderateScale(20)}}>OR</Text>
+            <Text
+              style={{
+                marginHorizontal: horizontalScale(7),
+                fontSize: moderateScale(20),
+              }}>
+              OR
+            </Text>
             <View style={{flex: 1, height: 1, backgroundColor: 'black'}} />
           </View>
         </View>
@@ -111,7 +158,9 @@ const CreateCircleScreen = () => {
             style={[styles.createBtn, {marginTop: moderateScale(30)}]}
             activeOpacity={0.7}
             onPress={() => setCreateCircleModalVisible(true)}>
-            <Text style={{color: 'white', fontWeight: '400'}}>Create Circle</Text>
+            <Text style={{color: 'white', fontWeight: '400'}}>
+              Create Circle
+            </Text>
           </TouchableOpacity>
           <Text>We will give you a code to share</Text>
         </View>
@@ -127,12 +176,37 @@ const CreateCircleScreen = () => {
           <View style={styles.centeredView}>
             <View style={styles.modalView}>
               <Text style={styles.modalText}>Name your Circle</Text>
-              <TextInput
-                mode="flat"
-                label="Enter Family360 email"
-                style={[styles.textInput, {marginTop: moderateScale(20)}]}
-                onChangeText={text => setCreateCircleCode(text)}
-                value={createCircleCode}
+              <Controller
+                control={control}
+                rules={{
+                  required: 'Please enter circle name.',
+                }}
+                render={({field: {onChange, onBlur, value}}) => (
+                  <>
+                    <TextInput
+                      multiline
+                      mode="flat"
+                      // label="Conatct Number"
+                      onBlur={onBlur}
+                      onChangeText={onChange}
+                      value={value}
+                      style={styles.textInput}
+                      error={errors.circleName}
+                    />
+                    {errors.circleName && (
+                      <HelperText
+                        type="error"
+                        style={{
+                          alignSelf: 'flex-start',
+                          // backgroundColor:'yellow',
+                          marginBottom: verticalScale(10),
+                        }}>
+                        {errors.circleName.message}
+                      </HelperText>
+                    )}
+                  </>
+                )}
+                name="circleName"
               />
               <View style={{flexDirection: 'row', alignSelf: 'flex-end'}}>
                 <Pressable
@@ -140,7 +214,9 @@ const CreateCircleScreen = () => {
                   onPress={() => setCreateCircleModalVisible(false)}>
                   <Text style={styles.textStyle}>BACK</Text>
                 </Pressable>
-                <Pressable style={styles.button}>
+                <Pressable
+                  style={[styles.button, {marginLeft: horizontalScale(10)}]}
+                  onPress={handleSubmit(handleCreateCircle)}>
                   <Text style={styles.textStyle}>CREATE</Text>
                 </Pressable>
               </View>
@@ -205,8 +281,9 @@ const styles = StyleSheet.create({
     width: '85%',
   },
   button: {
-    padding: moderateScale(10),
-    width: horizontalScale(80),
+    // padding: moderateScale(10),
+    // width: horizontalScale(50),
+    // backgroundColor:'green'
   },
   textStyle: {
     color: 'rgba(119,79,251,255)',
@@ -220,7 +297,7 @@ const styles = StyleSheet.create({
   textInput: {
     width: '100%',
     color: 'black',
-    marginBottom: verticalScale(20),
+    marginBottom: verticalScale(10),
     fontSize: moderateScale(14),
     borderBottomWidth: 1,
     borderBottomColor: 'rgba(119,79,251,1)',

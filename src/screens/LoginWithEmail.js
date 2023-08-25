@@ -54,6 +54,7 @@ const LoginWithEmail = ({navigation}) => {
           .get();
         if (userDoc.exists) {
           const userData = userDoc.data();
+          console.log(userData,"userData");
           dispatch(setUserData(userData));
           navigation.replace('tabbar');
           // navigation.replace('enteruserdetails');
