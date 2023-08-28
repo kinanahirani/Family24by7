@@ -21,11 +21,41 @@ import BottomSheet, {BottomSheetScrollView} from '@gorhom/bottom-sheet';
 import {GestureHandlerRootView} from 'react-native-gesture-handler';
 import Geolocation from 'react-native-geolocation-service';
 import MapView, {Marker} from 'react-native-maps';
+import firestore from '@react-native-firebase/firestore';
+import {useSelector} from 'react-redux';
+import SelectCircle from '../components/SelectCircle';
 const customMapStyle = require('../../map/map.json');
 
 const MapScreen = () => {
+  const [circleData, setCircleData] = useState({});
+  const userData = useSelector(state => state.user.data);
+  const refRBSheet = useRef();
+
+  const getUserCircle = async () => {
+    try {
+      const createdCircles = await firestore()
+        .collection('circles')
+        .where('createdUserId', '==', userData.id)
+        .get();
+
+      const joinedCircles = await firestore()
+        .collection('circles')
+        .where('usersOfCircles', 'array-contains', userData.id)
+        .get();
+
+      const circleData = {
+        createdCircles: createdCircles.docs.map(doc => doc.data()),
+        joinedCircles: joinedCircles.docs.map(doc => doc.data()),
+      };
+      setCircleData(circleData);
+      console.log('Circle Data:', circleData);
+    } catch (err) {
+      console.log('Error(getUserCircle): ', err);
+    }
+  };
   useEffect(() => {
     getCurrentLocation();
+    getUserCircle();
   }, []);
 
   const [latitude, setLatitude] = useState(0);
@@ -83,12 +113,28 @@ const MapScreen = () => {
             onPress={openDrawer}>
             <Feather name="menu" size={moderateScale(25)} color={'black'} />
           </TouchableOpacity>
-          <Text style={styles.headerTxt}>test circle</Text>
-          <AntDesign
-            name="caretdown"
-            size={moderateScale(10)}
-            color={'black'}
-          />
+
+          <TouchableOpacity
+            style={{flexDirection: 'row', alignItems: 'center'}}
+            activeOpacity={1}
+            onPress={() => refRBSheet.current.open()}>
+            <Text style={styles.headerTxt}>
+              {/* {circleData?.createdCircles[0]?.circleName ||
+                circleData?.joinedCircles[0]?.circleName} */}
+              {circleData.createdCircles && circleData.createdCircles.length > 0
+                ? circleData.createdCircles[0].circleName
+                : circleData.joinedCircles &&
+                  circleData.joinedCircles.length > 0
+                ? circleData.joinedCircles[0].circleName
+                : 'No Circle'}
+            </Text>
+            <AntDesign
+              name="caretdown"
+              size={moderateScale(10)}
+              color={'black'}
+            />
+          </TouchableOpacity>
+          <SelectCircle ref={refRBSheet} />
         </View>
 
         <View style={styles.headingSubView}>
@@ -219,7 +265,6 @@ const MapScreen = () => {
               <View
                 style={{
                   height: verticalScale(52),
-                  // backgroundColor: 'red',
                   justifyContent: 'center',
                   alignItems: 'center',
                   padding: moderateScale(7),

@@ -23,7 +23,7 @@ import {
   isCircleCodeUnique,
 } from '../helpers/circleHelpers';
 
-const CreateCircleScreen = () => {
+const CreateCircleScreen = ({navigation}) => {
   const [code, setCode] = useState(['', '', '', '', '', '']);
   const codeInputRefs = useRef([]);
   const [createCircleModalVisible, setCreateCircleModalVisible] =
@@ -78,10 +78,12 @@ const CreateCircleScreen = () => {
         createdAt:firestore.FieldValue.serverTimestamp()
       });
       console.log('Circle added with code:', circleCode);
+      navigation.navigate('tabbar')
     } catch (error) {
       console.error('Error adding circle:', error);
     }
   };
+  
   return (
     <View style={styles.container}>
       <ScrollView>
