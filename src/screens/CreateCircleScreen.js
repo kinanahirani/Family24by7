@@ -7,6 +7,7 @@ import {
   TouchableOpacity,
   Modal,
   Pressable,
+  Alert,
 } from 'react-native';
 import React, {useRef, useState} from 'react';
 import {
@@ -26,6 +27,7 @@ import {
 const CreateCircleScreen = ({navigation}) => {
   const [code, setCode] = useState(['', '', '', '', '', '']);
   const codeInputRefs = useRef([]);
+  const [codeChecked, setCodeChecked] = useState(false);
   const [createCircleModalVisible, setCreateCircleModalVisible] =
     useState(false);
 
@@ -42,7 +44,34 @@ const CreateCircleScreen = ({navigation}) => {
     },
   });
 
-  const handleCodeChange = (index, value) => {
+  const checkCircleCodeExists = async circleCode => {
+    try {
+      const circlesRef = firestore().collection('circles');
+      const userId = userData.id;
+      const querySnapshot = await circlesRef
+        .where('circleCode', '==', circleCode)
+        .get();
+
+      if (!querySnapshot.empty) {
+        const circleDoc = querySnapshot.docs[0];
+        console.log(circleDoc, '...circleDoc');
+        const circleData = circleDoc.data();
+
+        if (circleData.usersOfCircles.includes(userId)) {
+          return {exists: true, userAlreadyInCircle: true};
+        } else {
+          return {exists: true, userAlreadyInCircle: false};
+        }
+      } else {
+        return {exists: false, userAlreadyInCircle: false};
+      }
+    } catch (error) {
+      console.error('Error checking circle code:', error);
+      return {exists: false, userAlreadyInCircle: false};
+    }
+  };
+
+  const handleCodeChange = async (index, value) => {
     if (value === '') {
       code[index] = '';
     } else {
@@ -61,6 +90,46 @@ const CreateCircleScreen = ({navigation}) => {
       codeInputRefs.current[index + 1].focus();
     }
     setCode([...code]);
+
+    if (value === '' || index === codeInputRefs.current.length - 1) {
+      const enteredCode = code.join('');
+      const userId = userData.id;
+      const checkResult = await checkCircleCodeExists(enteredCode, userId);
+
+      if (checkResult.exists) {
+        if (checkResult.userAlreadyInCircle) {
+          console.log('User is already in the circle:', enteredCode);
+          Alert.alert('User is already in the circle.');
+        } else {
+          console.log(
+            'Circle code matches and user is not in the circle:',
+            enteredCode,
+          );
+          try {
+            const circleRef = firestore()
+              .collection('circles')
+              .doc(enteredCode);
+
+            await circleRef.update({
+              usersOfCircles: firestore.FieldValue.arrayUnion(userId),
+            });
+
+            console.log('User added to the circle:', userId);
+            Alert.alert('You have been added to the circle.');
+            navigation.replace('tabbar');
+          } catch (error) {
+            console.error('Error adding user to circle:', error);
+          }
+        }
+      } else {
+        console.log('Circle code does not match:', enteredCode);
+        Alert.alert('The circle code is wrong. Please enter proper code.');
+      }
+
+      setCodeChecked(true);
+    } else {
+      setCodeChecked(false);
+    }
   };
 
   const handleCreateCircle = async data => {
@@ -68,22 +137,22 @@ const CreateCircleScreen = ({navigation}) => {
     try {
       const circlesRef = firestore().collection('circles');
       const circleCode = await generateUniqueCircleCode(circlesRef);
-
-      const circle = await circlesRef.add({
+      const circleRef = circlesRef.doc(circleCode);
+      await circleRef.set({
         circleName,
         createdBy: userData.name,
         createdUserId: userData.id,
         usersOfCircles: [userData.id],
         circleCode: circleCode,
-        createdAt:firestore.FieldValue.serverTimestamp()
+        createdAt: firestore.FieldValue.serverTimestamp(),
       });
       console.log('Circle added with code:', circleCode);
-      navigation.navigate('tabbar')
+      navigation.navigate('tabbar');
     } catch (error) {
       console.error('Error adding circle:', error);
     }
   };
-  
+
   return (
     <View style={styles.container}>
       <ScrollView>
@@ -122,6 +191,11 @@ const CreateCircleScreen = ({navigation}) => {
                 value={digit}
                 onChangeText={value => handleCodeChange(index, value)}
                 ref={ref => (codeInputRefs.current[index] = ref)}
+                onSubmitEditing={() => {
+                  if (index < codeInputRefs.current.length - 1) {
+                    codeInputRefs.current[index + 1].focus();
+                  }
+                }}
               />
             ))}
           </View>

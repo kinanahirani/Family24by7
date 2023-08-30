@@ -8,8 +8,8 @@ import {
 
 const CBottomSheetButton = ({text, onPress}) => {
   return (
-    <TouchableOpacity 
-    onPress={onPress}
+    <TouchableOpacity
+      onPress={onPress}
       style={{
         borderWidth: moderateScale(1),
         borderRadius: moderateScale(10),
@@ -18,6 +18,9 @@ const CBottomSheetButton = ({text, onPress}) => {
         alignItems: 'center',
         justifyContent: 'center',
         borderColor: 'rgba(119,79,251,255)',
+        shadowColor: '#000',
+        backgroundColor: 'white',
+        elevation: 5,
       }}>
       <Text style={{color: 'rgba(119,79,251,255)'}}>{text}</Text>
     </TouchableOpacity>

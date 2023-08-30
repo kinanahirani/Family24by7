@@ -24,12 +24,19 @@ import MapView, {Marker} from 'react-native-maps';
 import firestore from '@react-native-firebase/firestore';
 import {useSelector} from 'react-redux';
 import SelectCircle from '../components/SelectCircle';
+import UsersLocationTrack from '../components/UsersLocationTrack';
+import UserNameHeader from '../components/UserNameHeader';
+import Entypo from 'react-native-vector-icons/Entypo';
+import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+import FontAwesome6 from 'react-native-vector-icons/FontAwesome6';
 const customMapStyle = require('../../map/map.json');
 
 const MapScreen = () => {
   const [circleData, setCircleData] = useState({});
   const userData = useSelector(state => state.user.data);
   const refRBSheet = useRef();
+  const [bottomSheetVisible, setBottomSheetVisible] = useState(false);
 
   const getUserCircle = async () => {
     try {
@@ -54,12 +61,33 @@ const MapScreen = () => {
     }
   };
   useEffect(() => {
-    getCurrentLocation();
-    getUserCircle();
+    // getCurrentLocation();
+    // getUserCircle();
+    // getUsersOfCircles();
+    const fetchData = async () => {
+      await getCurrentLocation();
+      await getUserCircle();
+      getUsersOfCircles();
+    };
+    fetchData();
   }, []);
 
   const [latitude, setLatitude] = useState(0);
   const [longitude, setLongitude] = useState(0);
+
+  const getUsersOfCircles = async () => {
+    if (
+      circleData &&
+      circleData.joinedCircles &&
+      circleData.joinedCircles.length > 0
+    ) {
+      const userIds = circleData.joinedCircles[0].usersOfCircles;
+
+      console.log(userIds, '...userIds');
+    } else {
+      console.log('No joined circles found.');
+    }
+  };
 
   const getCurrentLocation = async () => {
     try {
@@ -106,51 +134,96 @@ const MapScreen = () => {
 
   return (
     <GestureHandlerRootView style={styles.container}>
-      <View style={styles.header}>
-        <View style={styles.headingSubView}>
-          <TouchableOpacity
-            style={{padding: moderateScale(5)}}
-            onPress={openDrawer}>
-            <Feather name="menu" size={moderateScale(25)} color={'black'} />
-          </TouchableOpacity>
+      {bottomSheetVisible ? (
+        // <UserNameHeader />
+        // <View
+        //   style={{
+        //     height: verticalScale(60),
+        //     padding: moderateScale(10),
+        //     justifyContent: 'space-between',
+        //     flexDirection: 'row',
+        //     backgroundColor: 'white',
+        //     alignItems: 'center',
+        //   }}>
 
-          <TouchableOpacity
-            style={{flexDirection: 'row', alignItems: 'center'}}
-            activeOpacity={1}
-            onPress={() => refRBSheet.current.open()}>
-            <Text style={styles.headerTxt}>
-              {/* {circleData?.createdCircles[0]?.circleName ||
-                circleData?.joinedCircles[0]?.circleName} */}
-              {circleData.createdCircles && circleData.createdCircles.length > 0
-                ? circleData.createdCircles[0].circleName
-                : circleData.joinedCircles &&
-                  circleData.joinedCircles.length > 0
-                ? circleData.joinedCircles[0].circleName
-                : 'No Circle'}
+        //   <Text>UserNameHeader</Text>
+        // </View>
+        <View
+          style={{
+            flexDirection: 'row',
+            height: moderateScale(50),
+            alignItems: 'center',
+            paddingHorizontal: horizontalScale(16),
+            padding: moderateScale(10),
+            backgroundColor: 'white',
+            justifyContent: 'space-between',
+          }}>
+          <View style={{flexDirection: 'row', alignItems: 'center'}}>
+            <TouchableOpacity
+              onPress={() => setBottomSheetVisible(false)}
+              activeOpacity={0.7}>
+              <Ionicons name="arrow-back" color="black" size={25} />
+            </TouchableOpacity>
+            <Text
+              style={{
+                marginLeft: horizontalScale(10),
+                fontSize: moderateScale(15),
+                fontWeight: '400',
+                color: 'rgba(15, 24, 40, 1)',
+              }}>
+              Kinana Hirani
             </Text>
-            <AntDesign
-              name="caretdown"
-              size={moderateScale(10)}
+          </View>
+          <Feather name="refresh-cw" size={moderateScale(22)} color={'black'} />
+        </View>
+      ) : (
+        <View style={styles.header}>
+          <View style={styles.headingSubView}>
+            <TouchableOpacity
+              style={{padding: moderateScale(5)}}
+              onPress={openDrawer}>
+              <Feather name="menu" size={moderateScale(25)} color={'black'} />
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={{flexDirection: 'row', alignItems: 'center'}}
+              activeOpacity={1}
+              onPress={() => refRBSheet.current.open()}>
+              <Text style={styles.headerTxt}>
+                {/* {circleData?.createdCircles[0]?.circleName ||
+                circleData?.joinedCircles[0]?.circleName} */}
+                {circleData.createdCircles &&
+                circleData.createdCircles.length > 0
+                  ? circleData.createdCircles[0].circleName
+                  : circleData.joinedCircles &&
+                    circleData.joinedCircles.length > 0
+                  ? circleData.joinedCircles[0].circleName
+                  : 'No Circle'}
+              </Text>
+              <AntDesign
+                name="caretdown"
+                size={moderateScale(10)}
+                color={'black'}
+              />
+            </TouchableOpacity>
+            <SelectCircle ref={refRBSheet} />
+          </View>
+
+          <View style={styles.headingSubView}>
+            <Ionicons
+              name="chatbubble-outline"
+              size={moderateScale(25)}
               color={'black'}
             />
-          </TouchableOpacity>
-          <SelectCircle ref={refRBSheet} />
+            <Ionicons
+              name="notifications-outline"
+              size={moderateScale(25)}
+              color={'black'}
+              style={{marginLeft: horizontalScale(20)}}
+            />
+          </View>
         </View>
-
-        <View style={styles.headingSubView}>
-          <Ionicons
-            name="chatbubble-outline"
-            size={moderateScale(25)}
-            color={'black'}
-          />
-          <Ionicons
-            name="notifications-outline"
-            size={moderateScale(25)}
-            color={'black'}
-            style={{marginLeft: horizontalScale(20)}}
-          />
-        </View>
-      </View>
+      )}
 
       <MapView
         customMapStyle={customMapStyle}
@@ -164,184 +237,420 @@ const MapScreen = () => {
         <Marker coordinate={{latitude, longitude}} />
       </MapView>
 
-      <BottomSheet
-        ref={bottomSheetRef}
-        index={0}
-        snapPoints={snapPoints}
-        onChange={handleSheetChanges}>
-        <View style={styles.contentContainer}>
-          <View
-            style={{
-              flexDirection: 'row',
-            }}>
+      {bottomSheetVisible ? (
+        // <UsersLocationTrack
+        //   bottomSheetRef={bottomSheetRef}
+        //   snapPoints={snapPoints}
+        //   handleSheetChanges={handleSheetChanges}
+        //   navigation={navigation}
+        //   bottomSheetVisible={bottomSheetVisible}
+        // />
+        <BottomSheet
+          ref={bottomSheetRef}
+          index={0}
+          snapPoints={snapPoints}
+          onChange={handleSheetChanges}>
+          <View style={styles.contentContainer}>
             <View
               style={{
-                backgroundColor: 'rgba(247, 247, 252, 1)',
-                borderRadius: moderateScale(70),
-                width: moderateScale(70),
-                height: moderateScale(70),
-                alignItems: 'center',
-                justifyContent: 'center',
-                marginHorizontal: horizontalScale(20),
+                flexDirection: 'row',
+                justifyContent: 'space-between',
               }}>
-              <AntDesign name="user" size={moderateScale(35)} color={'black'} />
-            </View>
-            <View style={{flexDirection: 'column'}}>
               <Text
                 style={{
-                  fontWeight: 'bold',
-                  color: 'black',
-                  marginBottom: verticalScale(7),
-                  fontSize: moderateScale(13),
-                }}>
-                Kinana Hirani
-              </Text>
-              <Text
-                style={{
+                  width: '85%',
+                  marginLeft: horizontalScale(10),
                   fontWeight: '400',
-                  color: 'black',
-                  width: '75%',
-                  marginBottom: verticalScale(7),
                   fontSize: moderateScale(13),
+                  color: 'black',
                 }}>
-                Battery optimization is not disabled for Family360
+                Today at 7:48 pm ~ SHOP-07, ONE WORLD WEST, Ambli-Bopal road,
+                near vakil bridge, Ambli, Ahmedabad, Gujarat 380058, India
+                (Accurate up to 38 feet)
               </Text>
-              <Text style={{color: 'grey', fontSize: moderateScale(11)}}>
-                Since 11:43 am
-              </Text>
+              <TouchableOpacity onPress={() => setBottomSheetVisible(false)}>
+                <Entypo
+                  name="circle-with-cross"
+                  size={moderateScale(25)}
+                  color={'rgba(119,79,251,255)'}
+                  style={{marginRight: horizontalScale(10)}}
+                />
+              </TouchableOpacity>
+            </View>
+
+            <View
+              style={{
+                flexDirection: 'row',
+                marginVertical: verticalScale(20),
+                justifyContent: 'space-evenly',
+              }}>
+              <View style={{alignItems: 'center'}}>
+                <View
+                  style={{
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    borderWidth: 1,
+                    borderColor: 'rgba(128,128,128,0.5)',
+                    borderRadius: moderateScale(15),
+                    marginBottom: verticalScale(7),
+                  }}>
+                  <MaterialIcons
+                    name="location-history"
+                    size={moderateScale(15)}
+                    color={'rgba(119,79,251,255)'}
+                    style={{padding: moderateScale(3)}}
+                  />
+                </View>
+                <Text
+                  style={{
+                    textAlign: 'center',
+                    color: 'black',
+                    fontSize: moderateScale(11),
+                  }}>
+                  Location History
+                </Text>
+              </View>
+
+              <View style={{alignItems: 'center'}}>
+                <View
+                  style={{
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    borderWidth: 1,
+                    borderColor: 'rgba(128,128,128,0.5)',
+                    borderRadius: moderateScale(15),
+                    marginBottom: verticalScale(7),
+                  }}>
+                  <MaterialCommunityIcons
+                    name="go-kart-track"
+                    size={moderateScale(15)}
+                    color={'rgba(119,79,251,255)'}
+                    style={{
+                      padding: moderateScale(3),
+                    }}
+                  />
+                </View>
+                <Text
+                  style={{
+                    textAlign: 'center',
+                    color: 'black',
+                    fontSize: moderateScale(11),
+                  }}>
+                  Live Tracking
+                </Text>
+              </View>
+
+              <View style={{alignItems: 'center'}}>
+                <View
+                  style={{
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    borderWidth: 1,
+                    borderColor: 'rgba(128,128,128,0.5)',
+                    borderRadius: moderateScale(15),
+                    marginBottom: verticalScale(7),
+                  }}>
+                  <FontAwesome6
+                    name="diamond-turn-right"
+                    size={moderateScale(15)}
+                    color={'rgba(119,79,251,255)'}
+                    style={{
+                      padding: moderateScale(3),
+                    }}
+                  />
+                </View>
+                <Text
+                  style={{
+                    textAlign: 'center',
+                    color: 'black',
+                    fontSize: moderateScale(11),
+                  }}>
+                  Drive 0 feet
+                </Text>
+              </View>
+
+              <View style={{alignItems: 'center'}}>
+                <View
+                  style={{
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    borderWidth: 1,
+                    borderColor: 'rgba(128,128,128,0.5)',
+                    borderRadius: moderateScale(15),
+                    marginBottom: verticalScale(7),
+                  }}>
+                  <MaterialCommunityIcons
+                    name="message-text"
+                    size={moderateScale(15)}
+                    color={'rgba(119,79,251,255)'}
+                    style={{
+                      padding: moderateScale(3),
+                    }}
+                  />
+                </View>
+                <Text
+                  style={{
+                    textAlign: 'center',
+                    color: 'black',
+                    fontSize: moderateScale(11),
+                  }}>
+                  Message
+                </Text>
+              </View>
+            </View>
+
+            <View>
+              <View
+                style={{
+                  backgroundColor: 'rgba(128,128,128,0.1)',
+                  padding: moderateScale(5),
+                }}>
+                <Text
+                  style={{
+                    color: 'black',
+                    fontSize: moderateScale(14),
+                    marginLeft: horizontalScale(10),
+                  }}>
+                  Time
+                </Text>
+              </View>
               <View
                 style={{
                   width: '100%',
-                  backgroundColor: 'rgba(128,128,128,0.2)	',
-                  height: verticalScale(1),
-                  marginTop: verticalScale(20),
-                }}
-              />
+                  marginTop: verticalScale(15),
+                }}>
+                <View
+                  style={{
+                    flexDirection: 'row',
+                    width: '90%',
+                    alignItems: 'center',
+                    marginLeft: horizontalScale(10),
+                  }}>
+                  <Entypo
+                    name="dot-single"
+                    size={moderateScale(15)}
+                    color={'rgba(119,79,251,255)'}
+                    style={{
+                      padding: moderateScale(3),
+                    }}
+                  />
+                  <Text style={{color: 'black'}}>
+                    SHOP-07, ONE WORLD WEST, Ambli-Bopal road, near vakil
+                    bridge, Ambli, Ahmedabad, Gujarat 380058, India (Accurate up
+                    to 38 feet)
+                  </Text>
+                </View>
+                <Text
+                  style={{
+                    color: 'rgba(128,128,128,0.8)',
+                    fontSize: moderateScale(11),
+                    marginLeft: horizontalScale(31),
+                    marginTop: verticalScale(5),
+                  }}>
+                  Since yesterday at 10:47 am (last seen)
+                </Text>
+              </View>
             </View>
           </View>
-          <TouchableOpacity
-            onPress={() => navigation.navigate('ShareCircleCode')}
-            style={{
-              flexDirection: 'row',
-              justifyContent: 'center',
-              marginVertical: verticalScale(20),
-            }}>
-            <AntDesign
-              name="adduser"
-              size={moderateScale(18)}
-              color={'rgba(119,79,251,255)'}
-            />
-            <Text
-              style={{
-                color: 'rgba(119,79,251,255)',
-                fontSize: moderateScale(13),
-              }}>
-              Add a New Member
-            </Text>
-          </TouchableOpacity>
-
-          <BottomSheetScrollView
-            horizontal
-            showsHorizontalScrollIndicator={false}
-            contentContainerStyle={{
-              flexDirection: 'row',
-              justifyContent: 'center',
-              paddingHorizontal: horizontalScale(10),
-            }}>
+        </BottomSheet>
+      ) : (
+        <BottomSheet
+          ref={bottomSheetRef}
+          index={0}
+          snapPoints={snapPoints}
+          onChange={handleSheetChanges}>
+          <View style={styles.contentContainer}>
             <View
               style={{
-                width: horizontalScale(250),
-                height: '45%',
-                marginRight: horizontalScale(10),
-                elevation: 7,
-                shadowColor: 'black',
-                shadowOffset: {width: 0, height: 2},
-                shadowOpacity: 0.3,
-                shadowRadius: 4,
-                borderTopRightRadius: moderateScale(8),
-                borderTopLeftRadius: moderateScale(8),
-                backgroundColor: 'white',
+                flexDirection: 'row',
               }}>
               <View
                 style={{
-                  height: verticalScale(52),
-                  justifyContent: 'center',
+                  backgroundColor: 'rgba(247, 247, 252, 1)',
+                  borderRadius: moderateScale(70),
+                  width: horizontalScale(70),
+                  height: verticalScale(70),
                   alignItems: 'center',
-                  padding: moderateScale(7),
+                  justifyContent: 'center',
+                  marginHorizontal: horizontalScale(20),
                 }}>
+                <AntDesign
+                  name="user"
+                  size={moderateScale(35)}
+                  color={'black'}
+                />
+              </View>
+
+              <TouchableOpacity
+                style={{flexDirection: 'column'}}
+                onPress={() => setBottomSheetVisible(true)}>
                 <Text
                   style={{
+                    fontWeight: 'bold',
                     color: 'black',
-                    fontSize: moderateScale(14),
+                    marginBottom: verticalScale(7),
+                    fontSize: moderateScale(13),
                   }}>
-                  Get notified when family leaves/enters school, office etc.
+                  Kinana Hirani
                 </Text>
-              </View>
-              <TouchableOpacity
-                activeOpacity={0.7}
-                style={{
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  backgroundColor: 'black',
-                  padding: moderateScale(10),
-                  borderBottomRightRadius: moderateScale(8),
-                  borderBottomLeftRadius: moderateScale(8),
-                  height: verticalScale(45),
-                }}>
-                <Text style={{color: 'white', fontSize: moderateScale(13)}}>
-                  + Add Places
+                <Text
+                  style={{
+                    fontWeight: '400',
+                    color: 'black',
+                    width: '75%',
+                    marginBottom: verticalScale(7),
+                    fontSize: moderateScale(13),
+                  }}>
+                  Battery optimization is not disabled for Family360
                 </Text>
+                <Text style={{color: 'grey', fontSize: moderateScale(11)}}>
+                  Since 11:43 am
+                </Text>
+                <View
+                  style={{
+                    width: '100%',
+                    backgroundColor: 'rgba(128,128,128,0.2)	',
+                    height: verticalScale(1),
+                    marginTop: verticalScale(20),
+                  }}
+                />
               </TouchableOpacity>
             </View>
-
-            <View
+            <TouchableOpacity
+              onPress={() => navigation.navigate('ShareCircleCode')}
               style={{
-                width: horizontalScale(250),
-                height: '45%',
-                marginRight: horizontalScale(10),
-                elevation: 7,
-                shadowColor: 'black',
-                shadowOffset: {width: 0, height: 2},
-                shadowOpacity: 0.3,
-                shadowRadius: 4,
-                borderTopRightRadius: moderateScale(8),
-                borderTopLeftRadius: moderateScale(8),
-                backgroundColor: 'white',
+                flexDirection: 'row',
+                justifyContent: 'center',
+                marginVertical: verticalScale(20),
+              }}>
+              <AntDesign
+                name="adduser"
+                size={moderateScale(18)}
+                color={'rgba(119,79,251,255)'}
+              />
+              <Text
+                style={{
+                  color: 'rgba(119,79,251,255)',
+                  fontSize: moderateScale(13),
+                }}>
+                Add a New Member
+              </Text>
+            </TouchableOpacity>
+
+            <BottomSheetScrollView
+              horizontal
+              showsHorizontalScrollIndicator={false}
+              contentContainerStyle={{
+                flexDirection: 'row',
+                justifyContent: 'center',
+                paddingHorizontal: horizontalScale(10),
               }}>
               <View
                 style={{
-                  height: verticalScale(50),
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                  padding: moderateScale(7),
+                  width: horizontalScale(250),
+                  height: '45%',
+                  marginRight: horizontalScale(10),
+                  elevation: 7,
+                  shadowColor: 'black',
+                  shadowOffset: {width: 0, height: 2},
+                  shadowOpacity: 0.3,
+                  shadowRadius: 4,
+                  borderTopRightRadius: moderateScale(8),
+                  borderTopLeftRadius: moderateScale(8),
+                  backgroundColor: 'white',
                 }}>
-                <Text
+                <View
                   style={{
-                    color: 'black',
-                    fontSize: moderateScale(14),
+                    height: verticalScale(52),
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    padding: moderateScale(7),
                   }}>
-                  Get notified when family members cross speed limit
-                </Text>
+                  <Text
+                    style={{
+                      color: 'black',
+                      fontSize: moderateScale(14),
+                    }}>
+                    Get notified when family leaves/enters school, office etc.
+                  </Text>
+                </View>
+                <TouchableOpacity
+                  activeOpacity={0.7}
+                  style={{
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    backgroundColor: 'black',
+                    padding: moderateScale(10),
+                    borderBottomRightRadius: moderateScale(8),
+                    borderBottomLeftRadius: moderateScale(8),
+                    height: verticalScale(45),
+                  }}>
+                  <Text style={{color: 'white', fontSize: moderateScale(13)}}>
+                    + Add Places
+                  </Text>
+                </TouchableOpacity>
               </View>
-              <TouchableOpacity
-                activeOpacity={0.7}
+
+              <View
                 style={{
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  backgroundColor: 'black',
-                  padding: moderateScale(10),
-                  borderBottomRightRadius: moderateScale(8),
-                  borderBottomLeftRadius: moderateScale(8),
-                  height: verticalScale(45),
+                  width: horizontalScale(250),
+                  height: '45%',
+                  marginRight: horizontalScale(10),
+                  elevation: 7,
+                  shadowColor: 'black',
+                  shadowOffset: {width: 0, height: 2},
+                  shadowOpacity: 0.3,
+                  shadowRadius: 4,
+                  borderTopRightRadius: moderateScale(8),
+                  borderTopLeftRadius: moderateScale(8),
+                  backgroundColor: 'white',
                 }}>
-                <Text style={{color: 'white', fontSize: moderateScale(13)}}>
-                  Set speed alert
-                </Text>
-              </TouchableOpacity>
-            </View>
-          </BottomSheetScrollView>
-        </View>
-      </BottomSheet>
+                <View
+                  style={{
+                    height: verticalScale(50),
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    padding: moderateScale(7),
+                  }}>
+                  <Text
+                    style={{
+                      color: 'black',
+                      fontSize: moderateScale(14),
+                    }}>
+                    Get notified when family members cross speed limit
+                  </Text>
+                </View>
+                <TouchableOpacity
+                  activeOpacity={0.7}
+                  style={{
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    backgroundColor: 'black',
+                    padding: moderateScale(10),
+                    borderBottomRightRadius: moderateScale(8),
+                    borderBottomLeftRadius: moderateScale(8),
+                    height: verticalScale(45),
+                  }}>
+                  <Text style={{color: 'white', fontSize: moderateScale(13)}}>
+                    Set speed alert
+                  </Text>
+                </TouchableOpacity>
+              </View>
+            </BottomSheetScrollView>
+          </View>
+        </BottomSheet>
+      )}
+
+      {/* {bottomSheetVisible && (
+        <UsersLocationTrack
+          bottomSheetRef={bottomSheetRef}
+          snapPoints={snapPoints}
+          handleSheetChanges={handleSheetChanges}
+          navigation={navigation}
+          bottomSheetVisible={bottomSheetVisible}
+        />
+      )} */}
+      {/* {bottomSheetVisible && <UserNameHeader />} */}
     </GestureHandlerRootView>
   );
 };

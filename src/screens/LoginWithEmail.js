@@ -54,9 +54,23 @@ const LoginWithEmail = ({navigation}) => {
           .get();
         if (userDoc.exists) {
           const userData = userDoc.data();
-          console.log(userData,"userData");
-          dispatch(setUserData(userData));
-          navigation.replace('tabbar');
+          console.log(userData, 'userData');
+          const userCirclesRef = firestore()
+            .collection('circles')
+            .where('usersOfCircles', 'array-contains', userData.id);
+
+          const querySnapshot = await userCirclesRef.get();
+
+          if (!querySnapshot.empty) {
+            dispatch(setUserData(userData));
+            navigation.replace('tabbar');
+          } else {
+            dispatch(setUserData(userData));
+            navigation.replace('createcircle');
+          }
+
+          // dispatch(setUserData(userData));
+          // navigation.replace('tabbar');
           // navigation.replace('enteruserdetails');
           // navigation.replace('createcircle');
         } else {
