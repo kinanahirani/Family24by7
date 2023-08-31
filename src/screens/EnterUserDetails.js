@@ -63,17 +63,20 @@ const EnterUserDetails = ({navigation}) => {
 
   const uploadProfilePicture = async (userId, profilePicture) => {
     const {path} = profilePicture;
+    console.log('Image path:', path);
     const email = userData.email;
     const imageRef = storage().ref(`Profile Pictures/${email}.jpg`);
 
     try {
       await imageRef.putFile(path);
+      console.log('Image uploaded successfully');
       const downloadUrl = await imageRef.getDownloadURL();
+
       console.log('Profile picture uploaded:', downloadUrl);
       return downloadUrl;
     } catch (error) {
       console.log('Error uploading profile picture:', error);
-      return null;
+      throw error;
     }
   };
 
@@ -84,7 +87,12 @@ const EnterUserDetails = ({navigation}) => {
       await firestore().collection('users').doc(userId).update({
         profilePicture: downloadUrl,
       });
-      dispatch(setUserData({...userData, imageURL: profilePicture}));
+      dispatch(
+        setUserData({
+          ...userData,
+          imageURL: profilePicture,
+        }),
+      );
     }
 
     const contactValue = getValues('contact');
@@ -107,7 +115,7 @@ const EnterUserDetails = ({navigation}) => {
       includeBase64: true,
     })
       .then(image => {
-        setProfilePicture(image);
+        setProfilePicture(image.path);
       })
       .catch(error => {
         console.log(error);
@@ -146,7 +154,7 @@ const EnterUserDetails = ({navigation}) => {
           marginTop: moderateScale(60),
         }}>
         <TouchableOpacity onPress={handleMainPhotoUpload}>
-          {profilePicture ? (
+          {profilePicture && profilePicture.path ? (
             <Image
               source={{uri: profilePicture.path}}
               style={styles.profileImage}

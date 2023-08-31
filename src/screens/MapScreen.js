@@ -5,6 +5,7 @@ import {
   TouchableOpacity,
   ScrollView,
   PermissionsAndroid,
+  Image,
 } from 'react-native';
 import React, {useCallback, useEffect, useMemo, useRef, useState} from 'react';
 import {
@@ -34,58 +35,132 @@ const customMapStyle = require('../../map/map.json');
 
 const MapScreen = () => {
   const [circleData, setCircleData] = useState({});
+  const [latitude, setLatitude] = useState(0);
+  const [longitude, setLongitude] = useState(0);
   const userData = useSelector(state => state.user.data);
   const refRBSheet = useRef();
   const [bottomSheetVisible, setBottomSheetVisible] = useState(false);
+  const [usersData, setUsersData] = useState([]);
+
+  // useEffect(() => {
+  //   const fetchData = async () => {
+  //     await getCurrentLocation();
+  //     await getUserCircle();
+  //     // getUsersOfCircles();
+  //   };
+  //   fetchData();
+  // }, []);
+
+  // const getUserCircle = async () => {
+  //   try {
+  //     // const createdCircles = await firestore()
+  //     //   .collection('circles')
+  //     //   .where('createdUserId', '==', userData.id)
+  //     //   .get();
+
+  //     const joinedCircles = await firestore()
+  //       .collection('circles')
+  //       .where('usersOfCircles', 'array-contains', userData.id)
+  //       .get();
+
+  //     const circleData = {
+  //       // createdCircles: createdCircles.docs.map(doc => doc.data()),
+  //       joinedCircles: joinedCircles.docs.map(doc => doc.data()),
+  //     };
+  //     setCircleData(circleData);
+  //     console.log('Circle Data:', circleData);
+
+  //     getUsersOfCircles(circleData);
+  //   } catch (err) {
+  //     console.log('Error(getUserCircle): ', err);
+  //   }
+  // };
+
+  // const getUsersOfCircles = async () => {
+  //   if (
+  //     circleData &&
+  //     circleData.joinedCircles &&
+  //     circleData.joinedCircles.length > 0
+  //   ) {
+  //     const userIds = circleData.joinedCircles[0].usersOfCircles;
+  //     const fetchedUsersData = await Promise.all(
+  //       userIds.map(async userId => {
+  //         const userSnapshot = await firestore()
+  //           .collection('users')
+  //           .doc(userId)
+  //           .get();
+  //         const userData = userSnapshot.data();
+  //         return userData;
+  //       }),
+  //     );
+  //     setUsersData(fetchedUsersData);
+  //     console.log(userIds, '...userIds');
+  //     console.log(fetchedUsersData, '...fetchedUsersData');
+  //   } else {
+  //     console.log('No joined circles found.');
+  //   }
+  // };
+
+  useEffect(() => {
+    fetchData();
+  }, []);
+
+  const fetchData = async () => {
+    try {
+      console.log('Fetching user circle data...');
+      await getCurrentLocation();
+      await getUserCircle();
+    } catch (error) {
+      console.log('Error fetching data:', error);
+    }
+  };
 
   const getUserCircle = async () => {
     try {
-      const createdCircles = await firestore()
-        .collection('circles')
-        .where('createdUserId', '==', userData.id)
-        .get();
-
+      // const createdCircles = await firestore()
+      //   .collection('circles')
+      //   .where('createdUserId', '==', userData.id)
+      //   .get();
       const joinedCircles = await firestore()
         .collection('circles')
         .where('usersOfCircles', 'array-contains', userData.id)
         .get();
 
       const circleData = {
-        createdCircles: createdCircles.docs.map(doc => doc.data()),
+        // createdCircles: createdCircles.docs.map(doc => doc.data()),
         joinedCircles: joinedCircles.docs.map(doc => doc.data()),
       };
+
       setCircleData(circleData);
       console.log('Circle Data:', circleData);
+
+      if (circleData.joinedCircles && circleData.joinedCircles.length > 0) {
+        getUsersOfCircles(circleData);
+      } else {
+        console.log('No joined circles found.');
+      }
     } catch (err) {
       console.log('Error(getUserCircle): ', err);
     }
   };
-  useEffect(() => {
-    // getCurrentLocation();
-    // getUserCircle();
-    // getUsersOfCircles();
-    const fetchData = async () => {
-      await getCurrentLocation();
-      await getUserCircle();
-      getUsersOfCircles();
-    };
-    fetchData();
-  }, []);
 
-  const [latitude, setLatitude] = useState(0);
-  const [longitude, setLongitude] = useState(0);
-
-  const getUsersOfCircles = async () => {
-    if (
-      circleData &&
-      circleData.joinedCircles &&
-      circleData.joinedCircles.length > 0
-    ) {
-      const userIds = circleData.joinedCircles[0].usersOfCircles;
-
-      console.log(userIds, '...userIds');
-    } else {
-      console.log('No joined circles found.');
+  const getUsersOfCircles = async circleData => {
+    const userIds = circleData.joinedCircles[0].usersOfCircles;
+    try {
+      const fetchedUsersData = await Promise.all(
+        userIds.map(async userId => {
+          const userSnapshot = await firestore()
+            .collection('users')
+            .doc(userId)
+            .get();
+          const userData = userSnapshot.data();
+          return userData;
+        }),
+      );
+      console.log('Fetched Users Data:', fetchedUsersData);
+      setUsersData(fetchedUsersData);
+    } catch (err) {
+      console.log('Error(getUsersOfCircles): ', err);
     }
   };
 
@@ -234,7 +309,7 @@ const MapScreen = () => {
           latitudeDelta: 0.0922,
           longitudeDelta: 0.0421,
         }}>
-        <Marker coordinate={{latitude, longitude}} />
+        <Marker draggable coordinate={{latitude, longitude}} />
       </MapView>
 
       {bottomSheetVisible ? (
@@ -460,62 +535,98 @@ const MapScreen = () => {
           snapPoints={snapPoints}
           onChange={handleSheetChanges}>
           <View style={styles.contentContainer}>
-            <View
-              style={{
-                flexDirection: 'row',
-              }}>
-              <View
-                style={{
-                  backgroundColor: 'rgba(247, 247, 252, 1)',
-                  borderRadius: moderateScale(70),
-                  width: horizontalScale(70),
-                  height: verticalScale(70),
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  marginHorizontal: horizontalScale(20),
-                }}>
-                <AntDesign
-                  name="user"
-                  size={moderateScale(35)}
-                  color={'black'}
-                />
-              </View>
-
-              <TouchableOpacity
-                style={{flexDirection: 'column'}}
-                onPress={() => setBottomSheetVisible(true)}>
-                <Text
-                  style={{
-                    fontWeight: 'bold',
-                    color: 'black',
-                    marginBottom: verticalScale(7),
-                    fontSize: moderateScale(13),
-                  }}>
-                  Kinana Hirani
-                </Text>
-                <Text
-                  style={{
-                    fontWeight: '400',
-                    color: 'black',
-                    width: '75%',
-                    marginBottom: verticalScale(7),
-                    fontSize: moderateScale(13),
-                  }}>
-                  Battery optimization is not disabled for Family360
-                </Text>
-                <Text style={{color: 'grey', fontSize: moderateScale(11)}}>
-                  Since 11:43 am
-                </Text>
+            <BottomSheetScrollView>
+              {usersData.map((user, index) => (
                 <View
+                  key={index}
                   style={{
-                    width: '100%',
-                    backgroundColor: 'rgba(128,128,128,0.2)	',
-                    height: verticalScale(1),
-                    marginTop: verticalScale(20),
-                  }}
-                />
-              </TouchableOpacity>
-            </View>
+                    flexDirection: 'row',
+                    marginTop: verticalScale(10),
+                  }}>
+                  {user.profilePicture ? (
+                    <Image
+                      source={{uri: user.profilePicture}}
+                      style={{
+                        width: moderateScale(65),
+                        height: moderateScale(65),
+                        marginHorizontal: horizontalScale(20),
+                        borderRadius: moderateScale(32),
+                      }}
+                    />
+                  ) : (
+                    <View
+                      style={{
+                        backgroundColor: 'rgba(247, 247, 252, 1)',
+                        width: moderateScale(65),
+                        height: moderateScale(65),
+                        borderRadius: moderateScale(32),
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        marginHorizontal: horizontalScale(20),
+                      }}>
+                      <AntDesign
+                        name="user"
+                        size={moderateScale(35)}
+                        color={'black'}
+                      />
+                    </View>
+                  )}
+
+                  {/* <View
+                  style={{
+                    backgroundColor: 'rgba(247, 247, 252, 1)',
+                    borderRadius: moderateScale(70),
+                    width: horizontalScale(70),
+                    height: verticalScale(70),
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    marginHorizontal: horizontalScale(20),
+                  }}>
+                  <AntDesign
+                    name="user"
+                    size={moderateScale(35)}
+                    color={'black'}
+                  />
+                </View> */}
+
+                  <TouchableOpacity
+                    style={{flexDirection: 'column'}}
+                    onPress={() => setBottomSheetVisible(true)}>
+                    <Text
+                      style={{
+                        fontWeight: 'bold',
+                        color: 'black',
+                        marginBottom: verticalScale(7),
+                        fontSize: moderateScale(14),
+                      }}>
+                      {/* Kinana Hirani */}
+                      {user.name}
+                    </Text>
+                    <Text
+                      style={{
+                        fontWeight: '400',
+                        color: 'black',
+                        width: '75%',
+                        marginBottom: verticalScale(7),
+                        fontSize: moderateScale(13),
+                      }}>
+                      Battery optimization is not disabled for Family360
+                    </Text>
+                    <Text style={{color: 'grey', fontSize: moderateScale(11)}}>
+                      Since 11:43 am
+                    </Text>
+                    <View
+                      style={{
+                        width: '100%',
+                        backgroundColor: 'rgba(128,128,128,0.2)	',
+                        height: verticalScale(1),
+                        marginTop: verticalScale(20),
+                      }}
+                    />
+                  </TouchableOpacity>
+                </View>
+              ))}
+            </BottomSheetScrollView>
             <TouchableOpacity
               onPress={() => navigation.navigate('ShareCircleCode')}
               style={{
@@ -548,7 +659,7 @@ const MapScreen = () => {
               <View
                 style={{
                   width: horizontalScale(250),
-                  height: '45%',
+                  height: verticalScale(55),
                   marginRight: horizontalScale(10),
                   elevation: 7,
                   shadowColor: 'black',
@@ -594,7 +705,7 @@ const MapScreen = () => {
               <View
                 style={{
                   width: horizontalScale(250),
-                  height: '45%',
+                  height: verticalScale(55),
                   marginRight: horizontalScale(10),
                   elevation: 7,
                   shadowColor: 'black',
