@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from 'react';
-import {StyleSheet, Text, View, Image, TouchableOpacity} from 'react-native';
+import {StyleSheet, Text, View, Image, TouchableOpacity, ActivityIndicator} from 'react-native';
 import ImageCropPicker from 'react-native-image-crop-picker';
 import {useDispatch, useSelector} from 'react-redux';
 import {TextInput, HelperText} from 'react-native-paper';
@@ -20,6 +20,7 @@ const EnterUserDetails = ({navigation}) => {
   const userData = useSelector(state => state.user.data);
   const dispatch = useDispatch();
   const [profilePicture, setProfilePicture] = useState(null);
+  const [loading, setLoading] = useState(false);
 
   const {
     control,
@@ -68,10 +69,17 @@ const EnterUserDetails = ({navigation}) => {
     const imageRef = storage().ref(`Profile Pictures/${email}.jpg`);
 
     try {
-      await imageRef.putFile(path);
-      console.log('Image uploaded successfully');
-      const downloadUrl = await imageRef.getDownloadURL();
+      const fileExists = await imageRef.getDownloadURL().then(
+        () => true,
+        () => false,
+      );
 
+      if (!fileExists) {
+        await imageRef.putFile(path);
+        console.log('Image uploaded successfully');
+      }
+
+      const downloadUrl = await imageRef.getDownloadURL();
       console.log('Profile picture uploaded:', downloadUrl);
       return downloadUrl;
     } catch (error) {
@@ -81,30 +89,37 @@ const EnterUserDetails = ({navigation}) => {
   };
 
   const handleSave = async () => {
-    const userId = userData.id;
-    if (profilePicture) {
-      const downloadUrl = await uploadProfilePicture(userId, profilePicture);
-      await firestore().collection('users').doc(userId).update({
-        profilePicture: downloadUrl,
-      });
-      dispatch(
-        setUserData({
-          ...userData,
-          imageURL: profilePicture,
-        }),
-      );
+    setLoading(true);
+    try {
+      const userId = userData.id;
+      if (profilePicture) {
+        const downloadUrl = await uploadProfilePicture(userId, profilePicture);
+        await firestore().collection('users').doc(userId).update({
+          profilePicture: downloadUrl,
+        });
+        dispatch(
+          setUserData({
+            ...userData,
+            imageURL: profilePicture,
+          }),
+        );
+      }
+
+      const contactValue = getValues('contact');
+
+      if (contactValue) {
+        await firestore().collection('users').doc(userId).update({
+          mobileNumber: contactValue,
+        });
+
+        dispatch(setUserData({...userData, mobileNumber: contactValue}));
+      }
+      setLoading(false);
+      navigation.navigate('tabbar');
+    } catch (error) {
+      console.log('Error(handleSave):', error);
+      setLoading(false);
     }
-
-    const contactValue = getValues('contact');
-
-    if (contactValue) {
-      await firestore().collection('users').doc(userId).update({
-        mobileNumber: contactValue,
-      });
-
-      dispatch(setUserData({...userData, mobileNumber: contactValue}));
-    }
-    navigation.navigate('tabbar');
   };
 
   const handleMainPhotoUpload = () => {
@@ -115,7 +130,8 @@ const EnterUserDetails = ({navigation}) => {
       includeBase64: true,
     })
       .then(image => {
-        setProfilePicture(image.path);
+        // setProfilePicture(image.path);
+        setProfilePicture({path: image.path});
       })
       .catch(error => {
         console.log(error);
@@ -227,7 +243,11 @@ const EnterUserDetails = ({navigation}) => {
           activeOpacity={0.7}
           style={styles.saveButton}
           onPress={handleSubmit(handleSave)}>
-          <Text style={styles.saveButtonText}>Save</Text>
+          {loading ? (
+            <ActivityIndicator color="#fff" size="small" />
+          ) : (
+            <Text style={styles.saveButtonText}>Save</Text>
+          )}
         </TouchableOpacity>
       </View>
     </View>

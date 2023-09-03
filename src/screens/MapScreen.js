@@ -23,7 +23,6 @@ import {GestureHandlerRootView} from 'react-native-gesture-handler';
 import Geolocation from 'react-native-geolocation-service';
 import MapView, {Marker} from 'react-native-maps';
 import firestore from '@react-native-firebase/firestore';
-import {useSelector} from 'react-redux';
 import SelectCircle from '../components/SelectCircle';
 import UsersLocationTrack from '../components/UsersLocationTrack';
 import UserNameHeader from '../components/UserNameHeader';
@@ -31,16 +30,23 @@ import Entypo from 'react-native-vector-icons/Entypo';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import FontAwesome6 from 'react-native-vector-icons/FontAwesome6';
+import Geocoder from 'react-native-geocoding';
+import {useDispatch, useSelector} from 'react-redux';
+import {setCircleData} from '../redux/slices/circleDataSlice';
+import CMarker from '../components/CMarker';
 const customMapStyle = require('../../map/map.json');
 
 const MapScreen = () => {
-  const [circleData, setCircleData] = useState({});
+  // const [circleData, setCircleData1] = useState({});
   const [latitude, setLatitude] = useState(0);
   const [longitude, setLongitude] = useState(0);
   const userData = useSelector(state => state.user.data);
   const refRBSheet = useRef();
   const [bottomSheetVisible, setBottomSheetVisible] = useState(false);
   const [usersData, setUsersData] = useState([]);
+  const dispatch = useDispatch();
+  const circle = useSelector(state => state.circleData.data);
+  Geocoder.init('AIzaSyB09PIaNrUXMikGy415TQ3tCqYy8uXbpTs');
 
   // useEffect(() => {
   //   const fetchData = async () => {
@@ -105,47 +111,58 @@ const MapScreen = () => {
     fetchData();
   }, []);
 
+  // const fetchData = async () => {
+  //   try {
+  //     console.log('Fetching user circle data...');
+  //     await getUserCircle();
+  //     await getCurrentLocation();
+  //     await saveLocation();
+  //   } catch (error) {
+  //     console.log('Error fetching data:', error);
+  //   }
+  // };
+
   const fetchData = async () => {
     try {
       console.log('Fetching user circle data...');
-      await getCurrentLocation();
-      await getUserCircle();
+      const circleData1 = await getUserCircle();
+      const position = await getCurrentLocation();
+      if (circleData1 && position) {
+        await saveLocation();
+      }
     } catch (error) {
-      console.log('Error fetching data:', error);
+      console.log('Error(fetchData): ', error);
     }
   };
 
   const getUserCircle = async () => {
     try {
-      // const createdCircles = await firestore()
-      //   .collection('circles')
-      //   .where('createdUserId', '==', userData.id)
-      //   .get();
       const joinedCircles = await firestore()
         .collection('circles')
         .where('usersOfCircles', 'array-contains', userData.id)
         .get();
 
-      const circleData = {
-        // createdCircles: createdCircles.docs.map(doc => doc.data()),
+      const circleData1 = {
         joinedCircles: joinedCircles.docs.map(doc => doc.data()),
       };
 
-      setCircleData(circleData);
-      console.log('Circle Data:', circleData);
+      // setCircleData1(circleData1);
+      dispatch(setCircleData(circleData1));
+      console.log('Circle Data:', circleData1);
 
-      if (circleData.joinedCircles && circleData.joinedCircles.length > 0) {
-        getUsersOfCircles(circleData);
+      if (circleData1.joinedCircles && circleData1.joinedCircles.length > 0) {
+        getUsersOfCircles(circleData1);
       } else {
         console.log('No joined circles found.');
       }
+      return circleData1;
     } catch (err) {
       console.log('Error(getUserCircle): ', err);
     }
   };
 
-  const getUsersOfCircles = async circleData => {
-    const userIds = circleData.joinedCircles[0].usersOfCircles;
+  const getUsersOfCircles = async circleData1 => {
+    const userIds = circleData1.joinedCircles[0].usersOfCircles;
     try {
       const fetchedUsersData = await Promise.all(
         userIds.map(async userId => {
@@ -164,6 +181,49 @@ const MapScreen = () => {
     }
   };
 
+  // const getCurrentLocation = async () => {
+  //   try {
+  //     const granted = await PermissionsAndroid.request(
+  //       PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
+  //       {
+  //         title: 'Location Permission',
+  //         message: 'App needs access to your location',
+  //         buttonNeutral: 'Ask Me Later',
+  //         buttonNegative: 'Cancel',
+  //         buttonPositive: 'OK',
+  //       },
+  //     );
+  //     if (granted === PermissionsAndroid.RESULTS.GRANTED) {
+  //       return new Promise((resolve, reject) => {
+  //         Geolocation.getCurrentPosition(
+  //           async position => {
+  //             // console.log(position, 'position');
+  //             // setLatitude(position.coords.latitude);
+  //             // setLongitude(position.coords.longitude);
+  //             position => {
+  //               console.log(position, 'position');
+  //               setLatitude(position.coords.latitude);
+  //               setLongitude(position.coords.longitude);
+  //               resolve(position); // Resolve with the location data
+  //             },
+  //             error => {
+  //               console.log(error.code, error.message);
+  //               reject(error); // Reject with an error if there's an issue
+  //             },
+  //           },
+  //           {enableHighAccuracy: true, timeout: 15000, maximumAge: 10000},
+  //         );
+  //       });
+  //     } else {
+  //       console.log('Location permission denied');
+  //       return null;
+  //     }
+  //   } catch (err) {
+  //     console.warn(err);
+  //     return err;
+  //   }
+  // };
+
   const getCurrentLocation = async () => {
     try {
       const granted = await PermissionsAndroid.request(
@@ -177,23 +237,66 @@ const MapScreen = () => {
         },
       );
       if (granted === PermissionsAndroid.RESULTS.GRANTED) {
-        Geolocation.getCurrentPosition(
-          position => {
-            console.log(position);
-            setLatitude(position.coords.latitude);
-            setLongitude(position.coords.longitude);
-          },
-          error => {
-            console.log(error.code, error.message);
-          },
-          {enableHighAccuracy: true, timeout: 15000, maximumAge: 10000},
-        );
+        return new Promise((resolve, reject) => {
+          Geolocation.getCurrentPosition(
+            async position => {
+              console.log(position, 'position');
+              setLatitude(position.coords.latitude);
+              setLongitude(position.coords.longitude);
+              resolve(position); // Resolve with the location data
+            },
+            error => {
+              console.log(error.code, error.message);
+              reject(error); // Reject with an error if there's an issue
+            },
+            {enableHighAccuracy: true, timeout: 15000, maximumAge: 30000},
+          );
+        });
       } else {
         console.log('Location permission denied');
+        return null;
       }
     } catch (err) {
       console.warn(err);
+      return err;
     }
+  };
+
+  const saveLocation = async () => {
+    if (!circle) {
+      console.log('Circle is missing');
+      return;
+    }
+    console.log('Circle: ', circle);
+
+    for (const joinedCircle of circle.joinedCircles) {
+      const locationRef = firestore()
+        .collection('locations')
+        .doc(`${userData.id}-${joinedCircle.circleCode}`)
+        .collection('location_logs');
+
+      try {
+        await locationRef.add({
+          latitude,
+          longitude,
+          timestamp: firestore.FieldValue.serverTimestamp(),
+        });
+        console.log(
+          `Location stored in Firestore for ${joinedCircle.circleName}.`,
+        );
+      } catch (error) {
+        console.error(
+          `Error storing location for ${joinedCircle.circleName}:`,
+          error,
+        );
+      }
+    }
+    Geocoder.from(latitude, longitude)
+      .then(json => {
+        let addressComponent = json.results[0].address_components;
+        console.log(addressComponent);
+      })
+      .catch(error => console.warn(error));
   };
 
   const navigation = useNavigation();
@@ -210,19 +313,6 @@ const MapScreen = () => {
   return (
     <GestureHandlerRootView style={styles.container}>
       {bottomSheetVisible ? (
-        // <UserNameHeader />
-        // <View
-        //   style={{
-        //     height: verticalScale(60),
-        //     padding: moderateScale(10),
-        //     justifyContent: 'space-between',
-        //     flexDirection: 'row',
-        //     backgroundColor: 'white',
-        //     alignItems: 'center',
-        //   }}>
-
-        //   <Text>UserNameHeader</Text>
-        // </View>
         <View
           style={{
             flexDirection: 'row',
@@ -265,14 +355,10 @@ const MapScreen = () => {
               activeOpacity={1}
               onPress={() => refRBSheet.current.open()}>
               <Text style={styles.headerTxt}>
-                {/* {circleData?.createdCircles[0]?.circleName ||
-                circleData?.joinedCircles[0]?.circleName} */}
-                {circleData.createdCircles &&
-                circleData.createdCircles.length > 0
-                  ? circleData.createdCircles[0].circleName
-                  : circleData.joinedCircles &&
-                    circleData.joinedCircles.length > 0
-                  ? circleData.joinedCircles[0].circleName
+                {circle.createdCircles && circle.createdCircles.length > 0
+                  ? circle.createdCircles[0].circleName
+                  : circle.joinedCircles && circle.joinedCircles.length > 0
+                  ? circle.joinedCircles[0].circleName
                   : 'No Circle'}
               </Text>
               <AntDesign
@@ -302,14 +388,17 @@ const MapScreen = () => {
 
       <MapView
         customMapStyle={customMapStyle}
-        style={{width: '100%', height: '100%'}}
+        // style={{width: '100%', height: '100%'}}
+        style={{flex: 1}}
         region={{
           latitude,
           longitude,
           latitudeDelta: 0.0922,
           longitudeDelta: 0.0421,
         }}>
-        <Marker draggable coordinate={{latitude, longitude}} />
+        <Marker draggable coordinate={{latitude, longitude}}>
+          <CMarker img={userData.profilePicture} />
+        </Marker>
       </MapView>
 
       {bottomSheetVisible ? (
@@ -324,7 +413,14 @@ const MapScreen = () => {
           ref={bottomSheetRef}
           index={0}
           snapPoints={snapPoints}
-          onChange={handleSheetChanges}>
+          onChange={handleSheetChanges}
+          style={{
+            flex: 1,
+            backgroundColor: 'white',
+            elevation: 20,
+            borderTopRightRadius: moderateScale(20),
+            borderTopLeftRadius: moderateScale(20),
+          }}>
           <View style={styles.contentContainer}>
             <View
               style={{
@@ -533,7 +629,14 @@ const MapScreen = () => {
           ref={bottomSheetRef}
           index={0}
           snapPoints={snapPoints}
-          onChange={handleSheetChanges}>
+          onChange={handleSheetChanges}
+          style={{
+            flex: 1,
+            backgroundColor: 'white',
+            elevation: 50,
+            borderTopRightRadius: moderateScale(20),
+            borderTopLeftRadius: moderateScale(20),
+          }}>
           <View style={styles.contentContainer}>
             <BottomSheetScrollView>
               {usersData.map((user, index) => (
@@ -571,23 +674,6 @@ const MapScreen = () => {
                       />
                     </View>
                   )}
-
-                  {/* <View
-                  style={{
-                    backgroundColor: 'rgba(247, 247, 252, 1)',
-                    borderRadius: moderateScale(70),
-                    width: horizontalScale(70),
-                    height: verticalScale(70),
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    marginHorizontal: horizontalScale(20),
-                  }}>
-                  <AntDesign
-                    name="user"
-                    size={moderateScale(35)}
-                    color={'black'}
-                  />
-                </View> */}
 
                   <TouchableOpacity
                     style={{flexDirection: 'column'}}
