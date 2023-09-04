@@ -243,11 +243,11 @@ const MapScreen = () => {
               console.log(position, 'position');
               setLatitude(position.coords.latitude);
               setLongitude(position.coords.longitude);
-              resolve(position); // Resolve with the location data
+              resolve(position); 
             },
             error => {
               console.log(error.code, error.message);
-              reject(error); // Reject with an error if there's an issue
+              reject(error);
             },
             {enableHighAccuracy: true, timeout: 15000, maximumAge: 30000},
           );
@@ -257,7 +257,7 @@ const MapScreen = () => {
         return null;
       }
     } catch (err) {
-      console.warn(err);
+      console.log("Error(getCurrentLocation): ",err)
       return err;
     }
   };

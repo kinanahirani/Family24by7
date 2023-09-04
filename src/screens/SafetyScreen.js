@@ -6,8 +6,9 @@ import {
   View,
   Modal,
   Pressable,
+  PermissionsAndroid,
 } from 'react-native';
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {
   horizontalScale,
   moderateScale,
@@ -18,6 +19,8 @@ import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import {TextInput} from 'react-native-paper';
 import {useNavigation} from '@react-navigation/native';
+import Contacts from 'react-native-contacts';
+import Communications from 'react-native-communications';
 
 const SafetyScreen = () => {
   const defaultMessage =
@@ -25,6 +28,58 @@ const SafetyScreen = () => {
   const navigation = useNavigation();
   const [editModalVisible, setEditModalVisible] = useState(false);
   const [messageTxt, setMessageTxt] = useState(defaultMessage);
+
+  // const openDefaultContactPicker = () => {
+
+  //   Contacts.getAll((err, contacts) => {
+  //     if (err) {
+  //       console.log("Err:",err);
+  //     } else {
+  //       console.log('Contacts:', contacts);
+  //       Communications.phonebookPicker({
+  //         contacts,
+  //         callback: contact => {
+  //           // Handle the selected contact data here
+  //           console.log('Selected Contact:',contact);
+  //           // You can use the selected contact data as needed.
+  //         },
+  //       });
+  //     }
+  //   });
+  // };
+
+  const openDefaultContactPicker = async () => {
+    try {
+      const granted = await PermissionsAndroid.requestMultiple([
+        PermissionsAndroid.PERMISSIONS.READ_CONTACTS,
+      ]);
+
+      if (
+        granted['android.permission.READ_CONTACTS'] ===
+        PermissionsAndroid.RESULTS.GRANTED
+      ) {
+        // Permissions granted, you can now access contacts
+        Contacts.getAll()
+          .then(contacts => {
+            console.log(JSON.stringify(contacts), '....contacts');
+
+            // Communications.phonebookPicker({
+            //   contacts,
+            //   callback: contact => {
+            //     console.log('Selected Contact:', contact);
+            //   },
+            // });
+    
+          })
+          .catch(e => {
+            console.log(e);
+          });
+      }
+    } catch (err) {
+      console.log("Error:",err);
+    }
+  };
+
 
   return (
     <>
@@ -45,7 +100,10 @@ const SafetyScreen = () => {
           </Text>
 
           <ScrollView horizontal contentContainerStyle={styles.contactView}>
-            <TouchableOpacity activeOpacity={1} style={styles.addContact}>
+            <TouchableOpacity
+              activeOpacity={0}
+              style={styles.addContact}
+              onPress={()=>navigation.navigate('Contacts')}>
               <AntDesign
                 name="pluscircle"
                 size={moderateScale(40)}
