@@ -1,14 +1,85 @@
-import {StyleSheet, Switch, Text, TouchableOpacity, View} from 'react-native';
-import React, {useState} from 'react';
+import {
+  StyleSheet,
+  Switch,
+  Text,
+  TouchableOpacity,
+  View,
+  Linking,
+} from 'react-native';
+import React, {useEffect, useState} from 'react';
 import {
   horizontalScale,
   moderateScale,
   verticalScale,
 } from '../helpers/sizeHelpers';
+import {useRoute} from '@react-navigation/native';
+import Communications from 'react-native-communications';
+import {useSelector} from 'react-redux';
+import firestore from '@react-native-firebase/firestore';
 
 const SendAlertScreen = ({navigation}) => {
   const [isEnabled, setIsEnabled] = useState(true);
   const toggleSwitch = () => setIsEnabled(previousState => !previousState);
+  const [timer, setTimer] = useState(10);
+  const [isRunning, setIsRunning] = useState(true);
+  const [contactData, setContactData] = useState([]);
+  const userData = useSelector(state => state.user.data);
+  // const circleData=useSelector(state=>state.circle.data)
+  const route = useRoute();
+
+  const handleTimerTick = () => {
+    if (timer === 0) {
+      setIsRunning(false);
+      console.log('Timer Finished');
+      // Perform actions when the timer finishes
+    } else {
+      setTimer(timer - 1);
+    }
+  };
+
+  useEffect(() => {
+    if (isRunning) {
+      const timerId = setTimeout(() => {
+        handleTimerTick();
+      }, 1000);
+
+      return () => clearTimeout(timerId);
+    }
+  }, [timer, isRunning]);
+
+  const cancelTimer = () => {
+    setIsRunning(false);
+    console.log('Timer Canceled');
+    navigation.goBack();
+  };
+
+  const sendMessages = async () => {
+    setIsRunning(false);
+    const contacts = await firestore()
+      .collection('contacts')
+      .doc(userData.id)
+      .get();
+      const contactData = contacts.data();
+    setContactData(contactData);
+    let phoneNumbers;
+
+    if (contactData && contactData.contactList) {
+      phoneNumbers = contactData.contactList.map(contact => contact.number);
+    } else {
+      console.error('Contact data not found or contactList is empty');
+    }
+    const to = phoneNumbers.join(',');
+    const url = `sms:${to}?body=${encodeURIComponent(route.params.message)}`;
+    Linking.openURL(url)
+      .then(() => {
+        console.log('SMS app opened successfully');
+      })
+      .catch(err => {
+        console.error('Error(sendMessages): ', err);
+      });
+    alert('Messages Sent');
+    navigation.goBack();
+  };
 
   return (
     <>
@@ -35,7 +106,7 @@ const SendAlertScreen = ({navigation}) => {
             fontSize: moderateScale(40),
             marginTop: verticalScale(60),
           }}>
-          8
+          {timer}
         </Text>
         <Text
           style={{
@@ -50,6 +121,7 @@ const SendAlertScreen = ({navigation}) => {
         </Text>
         <TouchableOpacity
           activeOpacity={1}
+          onPress={sendMessages}
           style={{
             borderColor: 'white',
             borderWidth: 1,
@@ -99,7 +171,7 @@ const SendAlertScreen = ({navigation}) => {
 
       <TouchableOpacity
         activeOpacity={1}
-        onPress={() => navigation.goBack()}
+        onPress={cancelTimer}
         style={{
           height: verticalScale(50),
           backgroundColor: 'rgba(119,79,251,255)',

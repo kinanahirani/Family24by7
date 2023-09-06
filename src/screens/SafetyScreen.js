@@ -356,7 +356,7 @@ const SafetyScreen = () => {
         </TouchableOpacity>
         <TouchableOpacity
           activeOpacity={1}
-          onPress={() => navigation.navigate('sendAlert')}
+          onPress={() => navigation.navigate('sendAlert',{message: messageTxt})}
           style={[
             styles.box,
             {backgroundColor: 'rgb(204,0,0)', marginLeft: horizontalScale(10)},
