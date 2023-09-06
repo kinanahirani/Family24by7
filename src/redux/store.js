@@ -4,6 +4,7 @@ import {persistReducer, persistStore} from 'redux-persist';
 import autoMergeLevel2 from 'redux-persist/es/stateReconciler/autoMergeLevel2';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import circleDataSlice from './slices/circleDataSlice';
+import contactSlice from './slices/contactSlice';
 
 const persistConfig = {
   key: 'root',
@@ -13,12 +14,15 @@ const persistConfig = {
 };
 
 const persistedReducer = persistReducer(persistConfig, userSlice);
+const persistedContactReducer = persistReducer(persistConfig, contactSlice);
+
 // const persistedCircleDataReducer = persistReducer(persistConfig, circleDataSlice);
 
 const rootReducer = combineReducers({
   user: persistedReducer,
   // circleData: persistedCircleDataReducer,
   circleData: circleDataSlice,
+  // contactData: persistedContactReducer
 });
 
 const store = configureStore({

@@ -16,11 +16,16 @@ import {
 } from '../helpers/sizeHelpers';
 import AntDesign from 'react-native-vector-icons/AntDesign';
 import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
+import FontAwesome6 from 'react-native-vector-icons/FontAwesome6';
+import Zocial from 'react-native-vector-icons/Zocial';
+import Feather from 'react-native-vector-icons/Feather';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import {TextInput} from 'react-native-paper';
 import {useNavigation} from '@react-navigation/native';
 import Contacts from 'react-native-contacts';
 import Communications from 'react-native-communications';
+import {useSelector} from 'react-redux';
+import firestore from '@react-native-firebase/firestore';
 
 const SafetyScreen = () => {
   const defaultMessage =
@@ -28,6 +33,26 @@ const SafetyScreen = () => {
   const navigation = useNavigation();
   const [editModalVisible, setEditModalVisible] = useState(false);
   const [messageTxt, setMessageTxt] = useState(defaultMessage);
+  const userData = useSelector(state => state.user.data);
+  const [contactData, setContactData] = useState([]);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const contacts = await firestore()
+          .collection('contacts')
+          .doc(userData.id)
+          .get();
+        console.log(contacts.data(), '...contacts');
+        setContactData(contacts.data());
+      } catch (error) {
+        console.error('Error fetching data:', error);
+      }
+    };
+
+    fetchData();
+  }, []);
+  // const contactData=useSelector(state=>state.contact.data)
 
   // const openDefaultContactPicker = () => {
 
@@ -58,7 +83,6 @@ const SafetyScreen = () => {
         granted['android.permission.READ_CONTACTS'] ===
         PermissionsAndroid.RESULTS.GRANTED
       ) {
-        // Permissions granted, you can now access contacts
         Contacts.getAll()
           .then(contacts => {
             console.log(JSON.stringify(contacts), '....contacts');
@@ -69,17 +93,33 @@ const SafetyScreen = () => {
             //     console.log('Selected Contact:', contact);
             //   },
             // });
-    
           })
           .catch(e => {
             console.log(e);
           });
       }
     } catch (err) {
-      console.log("Error:",err);
+      console.log('Error:', err);
     }
   };
 
+  const deleteContact = index => {
+    const updatedContactList = [...contactData.contactList];
+    updatedContactList.splice(index, 1);
+
+    firestore()
+      .collection('contacts')
+      .doc(userData.id)
+      .update({
+        contactList: updatedContactList,
+      })
+      .then(() => {
+        setContactData({...contactData, contactList: updatedContactList});
+      })
+      .catch(error => {
+        console.error('Error deleting contact:', error);
+      });
+  };
 
   return (
     <>
@@ -99,35 +139,91 @@ const SafetyScreen = () => {
             Emergency Contacts:
           </Text>
 
-          <ScrollView horizontal contentContainerStyle={styles.contactView}>
-            <TouchableOpacity
-              activeOpacity={0}
-              style={styles.addContact}
-              onPress={()=>navigation.navigate('Contacts')}>
-              <AntDesign
-                name="pluscircle"
-                size={moderateScale(40)}
-                color={'rgba(119,79,251,255)'}
-              />
-            </TouchableOpacity>
-            <TouchableOpacity
-              activeOpacity={1}
-              style={[styles.addContact, {marginLeft: horizontalScale(15)}]}>
-              <AntDesign
-                name="pluscircle"
-                size={moderateScale(40)}
-                color={'rgba(119,79,251,255)'}
-              />
-            </TouchableOpacity>
-            <TouchableOpacity
-              activeOpacity={1}
-              style={[styles.addContact, {marginLeft: horizontalScale(15)}]}>
-              <AntDesign
-                name="pluscircle"
-                size={moderateScale(40)}
-                color={'rgba(119,79,251,255)'}
-              />
-            </TouchableOpacity>
+          <ScrollView
+            horizontal
+            contentContainerStyle={styles.contactView}
+            // style={{width:'100%'}}
+          >
+            {/* <View style={styles.contactContainer}> */}
+            {contactData?.contactList &&
+              contactData?.contactList?.map((contact, index) => (
+                <View
+                  key={index}
+                  style={{
+                    width: 'auto',
+                    height: verticalScale(95),
+                    borderRadius: moderateScale(10),
+                    borderWidth: 0.5,
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    borderColor: 'rgba(128,128,128,1)',
+                    marginRight:
+                      index < contactData.contactList.length - 1
+                        ? horizontalScale(15)
+                        : 0,
+                    padding: moderateScale(10),
+                  }}>
+                  <View
+                    style={{
+                      flexDirection: 'row',
+                      alignItems: 'center',
+                      alignSelf: 'flex-start',
+                    }}>
+                    <FontAwesome6
+                      name="user-large"
+                      size={moderateScale(20)}
+                      color={'rgba(119,79,251,255)'}
+                      style={{marginRight: horizontalScale(10)}}
+                    />
+                    <Text>{contact.name}</Text>
+                    <TouchableOpacity onPress={() => deleteContact(index)}>
+                      <Feather
+                        name="trash"
+                        size={moderateScale(20)}
+                        color={'black'}
+                        style={{marginLeft: horizontalScale(20)}}
+                      />
+                    </TouchableOpacity>
+                  </View>
+                  <View
+                    style={{
+                      flexDirection: 'row',
+                      alignItems: 'center',
+                      alignSelf: 'flex-start',
+                      marginTop: verticalScale(10),
+                    }}>
+                    <Zocial
+                      name="call"
+                      size={moderateScale(22)}
+                      color={'rgba(119,79,251,255)'}
+                      style={{marginRight: horizontalScale(7)}}
+                    />
+                    <Text>{contact.number}</Text>
+                  </View>
+                </View>
+              ))}
+            {Array.from({
+              length: Math.max(
+                3 -
+                  (contactData?.contactList
+                    ? contactData?.contactList?.length
+                    : 0),
+                0,
+              ),
+            }).map((_, index) => (
+              <TouchableOpacity
+                key={index}
+                activeOpacity={0.8}
+                style={styles.addContact}
+                onPress={() => navigation.navigate('Contacts')}>
+                <AntDesign
+                  name="pluscircle"
+                  size={moderateScale(40)}
+                  color={'rgba(119,79,251,255)'}
+                />
+              </TouchableOpacity>
+            ))}
+            {/* </View> */}
           </ScrollView>
 
           <View style={{padding: moderateScale(10)}}>
@@ -301,13 +397,13 @@ const styles = StyleSheet.create({
     fontWeight: '500',
   },
   contactView: {
-    flex: 1,
-    // width: '100%',
-    // height: '100%',
-    // flexDirection: 'row',
+    // flex:1,
+    // flexDirection:'row',
+    minWidth: '125%',
     padding: moderateScale(10),
-    paddingHorizontal: horizontalScale(10),
+    // paddingHorizontal: horizontalScale(10),
     marginTop: verticalScale(10),
+    alignItems: 'center',
   },
   addContact: {
     width: '27%',
@@ -317,6 +413,15 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     borderColor: 'rgba(128,128,128,1)',
+    marginLeft: horizontalScale(10),
+  },
+  contactContainer: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    alignItems: 'center',
+    paddingHorizontal: horizontalScale(10),
+    width: '100%',
+    justifyContent: 'space-between',
   },
   bottomView: {
     backgroundColor: 'white',
@@ -361,7 +466,6 @@ const styles = StyleSheet.create({
   button: {
     padding: moderateScale(10),
     // width: horizontalScale(80),
-    // backgroundColor:'green'
   },
   textStyle: {
     color: 'rgba(119,79,251,255)',

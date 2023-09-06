@@ -9,7 +9,7 @@ import {
   Platform,
 } from 'react-native';
 import React, {useEffect, useState} from 'react';
-import Contact from 'react-native-contacts';
+import Contacts from 'react-native-contacts';
 import {useIsFocused} from '@react-navigation/native';
 import Communications from 'react-native-communications';
 import {
@@ -17,10 +17,16 @@ import {
   moderateScale,
   verticalScale,
 } from '../helpers/sizeHelpers';
+import {useDispatch, useSelector} from 'react-redux';
+import {setContactData} from '../redux/slices/contactSlice';
+import firestore from '@react-native-firebase/firestore';
 
 const ContactListScreen = ({navigation}) => {
   const [contactList, setContactList] = useState([]);
   const isFocused = useIsFocused();
+  const dispatch = useDispatch();
+  const userData = useSelector(state => state.user.data);
+
   useEffect(() => {
     getPermission();
   }, [isFocused]);
@@ -32,11 +38,11 @@ const ContactListScreen = ({navigation}) => {
       buttonPositive: 'Please accept bare mortal',
     }).then(res => {
       if (res == 'granted') {
-        Contact.getAll()
-          .then(con => {
+        Contacts.getAll()
+          .then(contact => {
             // work with contacts
-            console.log(con);
-            setContactList(con);
+            console.log(contact);
+            setContactList(contact);
           })
           .catch(e => {
             console.log(e);
@@ -44,6 +50,37 @@ const ContactListScreen = ({navigation}) => {
       }
     });
   };
+
+  const handlePress = async ({item}) => {
+    console.log('item: ', JSON.stringify(item));
+    dispatch(
+      setContactData({
+        number: item.phoneNumbers[0].number,
+        name: item.displayName,
+      }),
+    );
+    const contactDocRef = firestore().collection('contacts').doc(userData.id);
+    const docSnapshot = await contactDocRef.get();
+    if (docSnapshot.exists) {
+      contactDocRef.update({
+        contactList: firestore.FieldValue.arrayUnion({
+          number: item.phoneNumbers[0].number,
+          name: item.displayName,
+        }),
+      });
+    } else {
+      contactDocRef.set({
+        contactList: [
+          {
+            number: item.phoneNumbers[0].number,
+            name: item.displayName,
+          },
+        ],
+      });
+    }
+    navigation.goBack();
+  };
+  
   return (
     <View style={{flex: 1, backgroundColor: 'white'}}>
       <FlatList
@@ -63,16 +100,15 @@ const ContactListScreen = ({navigation}) => {
                 justifyContent: 'space-between',
                 alignItems: 'center',
               }}
-              //   onPress={() => {
-              //     navigation.navigate('ContactDetails', {
-              //       data: item,
-              //     });
-              //   }}
-            >
+              onPress={() => handlePress({item})}>
               <View style={{flexDirection: 'row', alignItems: 'center'}}>
                 <Image
                   source={require('../images/user.png')}
-                  style={{width: horizontalScale(40), height: verticalScale(40), marginLeft: horizontalScale(15)}}
+                  style={{
+                    width: horizontalScale(40),
+                    height: verticalScale(40),
+                    marginLeft: horizontalScale(15),
+                  }}
                 />
                 <View style={{padding: moderateScale(10)}}>
                   <Text style={{color: 'black', fontSize: moderateScale(14)}}>
@@ -88,7 +124,11 @@ const ContactListScreen = ({navigation}) => {
                   </Text>
                 </View>
               </View>
-              <View style={{flexDirection: 'row', paddingRight: horizontalScale(15)}}>
+              <View
+                style={{
+                  flexDirection: 'row',
+                  paddingRight: horizontalScale(15),
+                }}>
                 <TouchableOpacity
                   onPress={() => {
                     const url = Communications.text(
@@ -123,27 +163,6 @@ const ContactListScreen = ({navigation}) => {
           );
         }}
       />
-      <TouchableOpacity
-        style={{
-          width: horizontalScale(50),
-          height: verticalScale(50),
-          borderRadius: moderateScale(25),
-          backgroundColor: 'gray',
-          position: 'absolute',
-          right: horizontalScale(30),
-          bottom: verticalScale(50),
-          justifyContent: 'center',
-          alignItems: 'center',
-        }}
-        // onPress={() => {
-        //   navigation.navigate('AddContact');
-        // }}
-      >
-        <Image
-          source={require('../images/plus.png')}
-          style={{width: horizontalScale(24), height: verticalScale(24)}}
-        />
-      </TouchableOpacity>
     </View>
   );
 };
