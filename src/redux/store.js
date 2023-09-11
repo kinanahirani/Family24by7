@@ -5,6 +5,7 @@ import autoMergeLevel2 from 'redux-persist/es/stateReconciler/autoMergeLevel2';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import circleDataSlice from './slices/circleDataSlice';
 import contactSlice from './slices/contactSlice';
+import locationSlice from './slices/locationSlice';
 
 const persistConfig = {
   key: 'root',
@@ -22,6 +23,7 @@ const rootReducer = combineReducers({
   user: persistedReducer,
   // circleData: persistedCircleDataReducer,
   circleData: circleDataSlice,
+  location:locationSlice
   // contactData: persistedContactReducer
 });
 

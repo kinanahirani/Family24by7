@@ -34,6 +34,7 @@ import Geocoder from 'react-native-geocoding';
 import {useDispatch, useSelector} from 'react-redux';
 import {setCircleData} from '../redux/slices/circleDataSlice';
 import CMarker from '../components/CMarker';
+import {setLocationData} from '../redux/slices/locationSlice';
 const customMapStyle = require('../../map/map.json');
 
 const MapScreen = () => {
@@ -110,6 +111,24 @@ const MapScreen = () => {
   useEffect(() => {
     fetchData();
   }, []);
+
+  useEffect(() => {
+    if (latitude && longitude) {
+      Geocoder.from(latitude, longitude)
+        .then(json => {
+          const addressComponent = json.results[0].address_components;
+          console.log('Address Data in use effect:', addressComponent);
+          const addressString = addressComponent
+            .map(component => component.long_name)
+            .join(', ');
+          console.log(addressString, '..addressString');
+          dispatch(setLocationData(addressString));
+        })
+        .catch(error => {
+          console.warn('Geocoder Error:', error);
+        });
+    }
+  }, [latitude, longitude]);
 
   // const fetchData = async () => {
   //   try {
@@ -243,7 +262,7 @@ const MapScreen = () => {
               console.log(position, 'position');
               setLatitude(position.coords.latitude);
               setLongitude(position.coords.longitude);
-              resolve(position); 
+              resolve(position);
             },
             error => {
               console.log(error.code, error.message);
@@ -257,7 +276,7 @@ const MapScreen = () => {
         return null;
       }
     } catch (err) {
-      console.log("Error(getCurrentLocation): ",err)
+      console.log('Error(getCurrentLocation): ', err);
       return err;
     }
   };
@@ -291,12 +310,18 @@ const MapScreen = () => {
         );
       }
     }
-    Geocoder.from(latitude, longitude)
-      .then(json => {
-        let addressComponent = json.results[0].address_components;
-        console.log(addressComponent);
-      })
-      .catch(error => console.warn(error));
+    // Geocoder.from(latitude, longitude)
+    //   .then(json => {
+    //     let addressComponent = json.results[0].address_components;
+    //     console.log(addressComponent, '..addressComponent');
+
+    //     const addressString = addressComponent
+    //       .map(component => component.long_name)
+    //       .join(', ');
+    //     console.log(addressString,"..addressString");
+    //     dispatch(setLocationData(addressString))
+    //   })
+    //   .catch(error => console.warn(error));
   };
 
   const navigation = useNavigation();

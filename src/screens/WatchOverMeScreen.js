@@ -15,18 +15,23 @@ import {
   verticalScale,
 } from '../helpers/sizeHelpers';
 import {TextInput} from 'react-native-paper';
+import {useSelector} from 'react-redux';
+import SendSMS from 'react-native-sms'
+import {GooglePlacesAutocomplete} from 'react-native-google-places-autocomplete';
 
 const WatchOverMeScreen = ({navigation}) => {
+  const startLocation = useSelector(state => state.location.data);
   const [destination, setDestination] = useState('');
-  const [location, setLocation] = useState('');
+  const [location, setLocation] = useState(startLocation ? startLocation : '');
   const [message, setMessage] = useState('');
   const [isEnabled, setIsEnabled] = useState(true);
+  const [isSearching, setIsSearching] = useState(false);
   const toggleSwitch = () => setIsEnabled(previousState => !previousState);
 
   return (
     <>
       <KeyboardAvoidingView style={{flex: 1}} behavior="height">
-        <ScrollView contentContainerStyle={styles.container}>
+        <View style={styles.container}>
           <View
             style={{
               flexDirection: 'row',
@@ -117,7 +122,7 @@ const WatchOverMeScreen = ({navigation}) => {
               <Text>{`${message.length}/200`}</Text>
             </View>
           </View>
-        </ScrollView>
+        </View>
       </KeyboardAvoidingView>
 
       <View>
@@ -130,7 +135,7 @@ const WatchOverMeScreen = ({navigation}) => {
             // position: 'absolute',
             // bottom: verticalScale(70),
             // left: 0,
-            // right: 0,
+            // right: 0
             alignItems: 'center',
             backgroundColor: 'white',
           }}>
@@ -138,6 +143,7 @@ const WatchOverMeScreen = ({navigation}) => {
             style={{
               flexDirection: 'row',
               justifyContent: 'space-between',
+              marginBottom: verticalScale(20),
             }}>
             <Text
               style={{

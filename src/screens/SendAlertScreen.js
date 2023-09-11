@@ -16,6 +16,7 @@ import {useRoute} from '@react-navigation/native';
 import Communications from 'react-native-communications';
 import {useSelector} from 'react-redux';
 import firestore from '@react-native-firebase/firestore';
+import SendSMS from 'react-native-sms';
 
 const SendAlertScreen = ({navigation}) => {
   const [isEnabled, setIsEnabled] = useState(true);
@@ -59,7 +60,7 @@ const SendAlertScreen = ({navigation}) => {
       .collection('contacts')
       .doc(userData.id)
       .get();
-      const contactData = contacts.data();
+    const contactData = contacts.data();
     setContactData(contactData);
     let phoneNumbers;
 
@@ -68,17 +69,37 @@ const SendAlertScreen = ({navigation}) => {
     } else {
       console.error('Contact data not found or contactList is empty');
     }
-    const to = phoneNumbers.join(',');
-    const url = `sms:${to}?body=${encodeURIComponent(route.params.message)}`;
-    Linking.openURL(url)
-      .then(() => {
-        console.log('SMS app opened successfully');
-      })
-      .catch(err => {
-        console.error('Error(sendMessages): ', err);
-      });
-    alert('Messages Sent');
-    navigation.goBack();
+    // const to = phoneNumbers.join(',');
+    // const url = `sms:${to}?body=${encodeURIComponent(route.params.message)}`;
+    // Linking.openURL(url)
+    //   .then(() => {
+    //     console.log('SMS app opened successfully');
+    //   })
+    //   .catch(err => {
+    //     console.error('Error(sendMessages): ', err);
+    //   });
+    // alert('Messages Sent');
+    // navigation.goBack();
+
+    if (isEnabled) {
+      SendSMS.send(
+        {
+          body: route.params.message,
+          recipients: phoneNumbers,
+          successTypes: ['sent', 'queued'],
+          allowAndroidSendWithoutReadPermission: true,
+        },
+        (completed, cancelled, error) => {
+          if (completed) {
+            console.log('SMS sent successfully');
+          } else if (cancelled) {
+            console.log('SMS cancelled');
+          } else if (error) {
+            console.error('Error sending SMS:', error);
+          }
+        },
+      );
+    }
   };
 
   return (
@@ -115,6 +136,7 @@ const SendAlertScreen = ({navigation}) => {
             fontSize: moderateScale(19),
             textAlign: 'center',
             marginTop: '20%',
+            width: '90%',
           }}>
           An *SMS and a high priority notification will be sent to your Circle
           members & Emergency contacts.

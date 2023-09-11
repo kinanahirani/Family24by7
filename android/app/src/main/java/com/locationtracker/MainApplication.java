@@ -9,6 +9,9 @@ import com.facebook.react.defaults.DefaultNewArchitectureEntryPoint;
 import com.facebook.react.defaults.DefaultReactNativeHost;
 import com.facebook.soloader.SoLoader;
 import java.util.List;
+import com.tkporter.sendsms.SendSMSPackage;
+// import com.facebook.react.shell.MainReactPackage;
+// import io.veryape.rn.sendintent.SendSMSPackage;
 // import com.rt2zz.reactnativecontacts.ReactNativeContacts;
 // import com.lynxit.contactswrapper.ContactsWrapperPackage;
 
@@ -29,6 +32,8 @@ public class MainApplication extends Application implements ReactApplication {
           // packages.add(new MyReactNativePackage());
           // packages.add(new ReactNativeContacts());
           // packages.add(new ContactsWrapperPackage());
+          // packages.add(new MainReactPackage());
+          // packages.add(new SendSMSPackage());
           return packages;
         }
 
