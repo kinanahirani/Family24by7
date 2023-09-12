@@ -13,6 +13,7 @@ import SendAlertScreen from '../screens/SendAlertScreen';
 import WatchOverMeScreen from '../screens/WatchOverMeScreen';
 import ShareCircleCodeScreen from '../screens/ShareCircleCodeScreen';
 import ContactListScreen from '../screens/ContactListScreen';
+import AddNewPlaceScreen from '../screens/AddNewPlaceScreen';
 
 const Stack = createNativeStackNavigator();
 
@@ -34,6 +35,7 @@ export default AppNavigator = () => {
       <Stack.Screen name="WatchOverMe" component={WatchOverMeScreen} />
       <Stack.Screen name="ShareCircleCode" component={ShareCircleCodeScreen} />
       <Stack.Screen name="Contacts" component={ContactListScreen} />
+      <Stack.Screen name="AddNewPlace" component={AddNewPlaceScreen} />
     </Stack.Navigator>
   );
 };

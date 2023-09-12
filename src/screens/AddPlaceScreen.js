@@ -6,8 +6,10 @@ import {
   moderateScale,
   verticalScale,
 } from '../helpers/sizeHelpers';
+import {useNavigation} from '@react-navigation/native';
 
 const AddPlaceScreen = () => {
+  const navigation = useNavigation();
   return (
     <>
       <View style={styles.container}>
@@ -52,6 +54,8 @@ const AddPlaceScreen = () => {
             place (2 free places)
           </Text>
           <TouchableOpacity
+            onPress={() => navigation.navigate('AddNewPlace')}
+            activeOpacity={1}
             style={{
               backgroundColor: 'rgba(119,79,251,255)',
               marginTop: verticalScale(15),
@@ -72,6 +76,8 @@ const AddPlaceScreen = () => {
         </View>
       </View>
       <TouchableOpacity
+        onPress={() => navigation.navigate('AddNewPlace')}
+        activeOpacity={1}
         style={{
           backgroundColor: 'rgba(119,79,251,255)',
           padding: moderateScale(8),
