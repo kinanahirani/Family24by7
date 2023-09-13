@@ -8,9 +8,13 @@ import {
 } from '@react-native-google-signin/google-signin';
 import firestore from '@react-native-firebase/firestore';
 import {useNavigation} from '@react-navigation/native';
+import {setUserData} from '../redux/slices/userSlice';
+import {useDispatch} from 'react-redux';
+import auth from '@react-native-firebase/auth';
 
 const LoginOptionScreen = () => {
   const navigation = useNavigation();
+  const dispatch = useDispatch();
   useEffect(() => {
     GoogleSignin.configure({
       webClientId:
@@ -22,35 +26,66 @@ const LoginOptionScreen = () => {
     try {
       await GoogleSignin.hasPlayServices({showPlayServicesUpdateDialog: true});
       const usrInfo = await GoogleSignin.signIn();
-      console.log(usrInfo, 'usrinfo');
 
-      const userDocRef = firestore().collection('users').doc(usrInfo.user.id);
-      console.log(userDocRef, 'userDocRef');
-      await userDocRef.set({
-        email: usrInfo.user.email,
-        id: usrInfo.user.id,
-        name: usrInfo.user.name,
-        photo: usrInfo.user.photo,
-      });
-      navigation.replace('tabbar');
+      if (usrInfo) {
+        const userDocRef = firestore().collection('users').doc(usrInfo.user.id);
+        const userDocSnapshot = await userDocRef.get();
+        let userData;
+
+        if (userDocSnapshot.exists) {
+          userData = userDocSnapshot.data();
+          const userCirclesRef = firestore()
+            .collection('circles')
+            .where('usersOfCircles', 'array-contains', userData.id);
+
+          const querySnapshot = await userCirclesRef.get();
+
+          const googleCredential = auth.GoogleAuthProvider.credential(
+            usrInfo.idToken,
+          );
+
+          if (!querySnapshot.empty) {
+            dispatch(setUserData(userData));
+            navigation.replace('tabbar');
+          } else {
+            dispatch(setUserData(userData));
+            navigation.replace('createcircle');
+          }
+
+          console.log('Successfully signed in:', userData);
+          return auth().signInWithCredential(googleCredential);
+        } else {
+          userData = {
+            email: usrInfo.user.email,
+            id: usrInfo.user.id,
+            name: usrInfo.user.name,
+            profilePicture: usrInfo.user.photo,
+          };
+          await userDocRef.set(userData);
+          dispatch(setUserData(userData));
+          const googleCredential = auth.GoogleAuthProvider.credential(
+            usrInfo.idToken,
+          );
+          navigation.replace('createcircle');
+          console.log('Successfully signed up:', userData);
+          return auth().signInWithCredential(googleCredential);
+        }
+      }
     } catch (error) {
       if (error.code === statusCodes.SIGN_IN_CANCELLED) {
+        console.log('Error(googleSignIn): ', error);
         // user cancelled the login flow
       } else if (error.code === statusCodes.IN_PROGRESS) {
         // operation (e.g. sign in) is in progress already
+        console.log('Error(googleSignIn): ', error);
       } else if (error.code === statusCodes.PLAY_SERVICES_NOT_AVAILABLE) {
+        console.log('Error(googleSignIn): ', error);
         // play services not available or outdated
       } else {
+        console.log('Error(googleSignIn): ', error);
         // some other error happened
       }
     }
-
-    // try {
-    //     await GoogleSignin.signOut();
-    //     setUserInfo({ user: null }); // Remember to remove the user from your app's state as well
-    //   } catch (error) {
-    //     console.error(error);
-    //   }
   };
 
   return (
@@ -129,6 +164,6 @@ const styles = StyleSheet.create({
   loginText: {
     color: 'white',
     fontWeight: '500',
-    fontSize:moderateScale(14)
+    fontSize: moderateScale(14),
   },
 });

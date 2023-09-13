@@ -21,6 +21,11 @@ import store from '../redux/store';
 import {persistStore} from 'redux-persist';
 import auth from '@react-native-firebase/auth';
 import AntDesign from 'react-native-vector-icons/AntDesign';
+import {
+  GoogleSignin,
+  GoogleSigninButton,
+  statusCodes,
+} from '@react-native-google-signin/google-signin';
 
 const MenuScreen = () => {
   const dispatch = useDispatch();
@@ -29,9 +34,31 @@ const MenuScreen = () => {
     useState(false);
 
   const handleLogout = async () => {
+    const user = auth().currentUser;
+
+    if (user) {
+      const providers = user.providerData;
+      console.log(providers, '...providers');
+      const isGoogleSignIn = providers.some(
+        provider => provider.providerId === 'google.com',
+      );
+
+      if (isGoogleSignIn) {
+        try {
+          await GoogleSignin.signOut();
+        } catch (error) {
+          console.error(error);
+        }
+      }
+    }
+
     dispatch(setUserData(''));
     await persistStore(store).purge();
-    await auth().signOut();
+    const currentUser = auth().currentUser;
+    if (currentUser) {
+      await auth().signOut();
+    }
+
     setCreateCircleModalVisible(false);
     navigation.replace('loginoptions');
   };
@@ -147,7 +174,12 @@ const MenuScreen = () => {
             <Text style={styles.modalText}>
               Are you sure you want to logout?
             </Text>
-            <View style={{flexDirection: 'row', alignSelf: 'flex-end', marginTop:verticalScale(20)}}>
+            <View
+              style={{
+                flexDirection: 'row',
+                alignSelf: 'flex-end',
+                marginTop: verticalScale(20),
+              }}>
               <Pressable
                 style={[styles.button]}
                 onPress={() => setCreateCircleModalVisible(false)}>
@@ -216,7 +248,7 @@ const styles = StyleSheet.create({
     fontSize: moderateScale(16),
     fontWeight: '500',
     color: 'black',
-    textAlign:'center'
+    textAlign: 'center',
   },
 });
 
