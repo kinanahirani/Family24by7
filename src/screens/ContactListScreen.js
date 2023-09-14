@@ -20,9 +20,12 @@ import {
 import {useDispatch, useSelector} from 'react-redux';
 import {setContactData} from '../redux/slices/contactSlice';
 import firestore from '@react-native-firebase/firestore';
+import {TextInput} from 'react-native-paper';
+import Icon from 'react-native-vector-icons/MaterialIcons';
 
 const ContactListScreen = ({navigation}) => {
   const [contactList, setContactList] = useState([]);
+  const [searchQuery, setSearchQuery] = useState('');
   const isFocused = useIsFocused();
   const dispatch = useDispatch();
   const userData = useSelector(state => state.user.data);
@@ -68,6 +71,7 @@ const ContactListScreen = ({navigation}) => {
           name: item.displayName,
         }),
       });
+      navigation.goBack();
     } else {
       contactDocRef.set({
         contactList: [
@@ -77,12 +81,66 @@ const ContactListScreen = ({navigation}) => {
           },
         ],
       });
+      navigation.goBack();
     }
-    navigation.goBack();
+  };
+
+  // const handleSearch = query => {
+  //   const filteredContactList = contactList.filter(
+  //     contact =>
+  //       contact.displayName.toLowerCase().includes(query.toLowerCase()) ||
+  //       contact.phoneNumbers[0].number
+  //         .toLowerCase()
+  //         .includes(query.toLowerCase()),
+  //   );
+
+  //   setSearchQuery(query);
+
+  //   setContactList(filteredContactList);
+  // };
+
+  const handleSearch = query => {
+    const filteredContactList = contactList.filter(contact => {
+      const displayName = contact.displayName
+        ? contact.displayName.toLowerCase()
+        : ''; // Set displayName to an empty string if it's null or undefined
+  
+      const phoneNumber =
+        contact.phoneNumbers &&
+        contact.phoneNumbers[0] &&
+        contact.phoneNumbers[0].number
+          ? contact.phoneNumbers[0].number.toLowerCase()
+          : ''; // Set phoneNumber to an empty string if it's null or undefined
+  
+      return (
+        displayName.includes(query.toLowerCase()) ||
+        phoneNumber.includes(query.toLowerCase())
+      );
+    });
+  
+    setSearchQuery(query);
+    setContactList(filteredContactList);
   };
   
+  
+
   return (
     <View style={{flex: 1, backgroundColor: 'white'}}>
+      <TextInput
+        label="Search"
+        value={searchQuery}
+        // onChangeText={(text)=>setSearchQuery(text)}
+        onChangeText={handleSearch}
+        style={{
+          marginVertical: 20,
+          width: '90%',
+          alignSelf: 'center',
+          backgroundColor: 'transparent',
+        }}
+        right={
+          <TextInput.Icon name="search" onPress={handleSearch} color={'red'} />
+        }
+      />
       <FlatList
         data={contactList}
         renderItem={({item, index}) => {

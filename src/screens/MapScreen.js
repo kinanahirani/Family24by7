@@ -121,8 +121,14 @@ const MapScreen = () => {
           const addressString = addressComponent
             .map(component => component.long_name)
             .join(', ');
-          console.log(addressString, '..addressString');
-          dispatch(setLocationData(addressString));
+            
+          dispatch(
+            setLocationData({
+              latitude,
+              longitude,
+              address: addressString,
+            }),
+          );
         })
         .catch(error => {
           console.warn('Geocoder Error:', error);

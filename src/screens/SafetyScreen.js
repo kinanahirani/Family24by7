@@ -21,7 +21,7 @@ import Zocial from 'react-native-vector-icons/Zocial';
 import Feather from 'react-native-vector-icons/Feather';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import {TextInput} from 'react-native-paper';
-import {useNavigation} from '@react-navigation/native';
+import {useIsFocused, useNavigation} from '@react-navigation/native';
 import Contacts from 'react-native-contacts';
 import Communications from 'react-native-communications';
 import {useSelector} from 'react-redux';
@@ -35,6 +35,10 @@ const SafetyScreen = () => {
   const [messageTxt, setMessageTxt] = useState(defaultMessage);
   const userData = useSelector(state => state.user.data);
   const [contactData, setContactData] = useState([]);
+  const [contactDataLength, setContactDataLength] = useState(0);
+  const isFocused = useIsFocused();
+  const width = contactDataLength > 2 ? '120%' : '100%';
+  const [minWidth, setMinWidth] = useState(width);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -45,13 +49,14 @@ const SafetyScreen = () => {
           .get();
         console.log(contacts.data(), '...contacts');
         setContactData(contacts.data());
+        setContactDataLength(contactData.length)
       } catch (error) {
         console.error('Error fetching data:', error);
       }
     };
 
     fetchData();
-  }, []);
+  }, [isFocused]);
   // const contactData=useSelector(state=>state.contact.data)
 
   // const openDefaultContactPicker = () => {
@@ -142,6 +147,7 @@ const SafetyScreen = () => {
           <ScrollView
             horizontal
             contentContainerStyle={styles.contactView}
+            showsHorizontalScrollIndicator={false}
             // style={{width:'100%'}}
           >
             {/* <View style={styles.contactContainer}> */}
@@ -356,7 +362,9 @@ const SafetyScreen = () => {
         </TouchableOpacity>
         <TouchableOpacity
           activeOpacity={1}
-          onPress={() => navigation.navigate('sendAlert',{message: messageTxt})}
+          onPress={() =>
+            navigation.navigate('sendAlert', {message: messageTxt})
+          }
           style={[
             styles.box,
             {backgroundColor: 'rgb(204,0,0)', marginLeft: horizontalScale(10)},
@@ -396,17 +404,21 @@ const styles = StyleSheet.create({
     color: 'black',
     fontWeight: '500',
   },
+  // width: {
+  //   width: contactDataLength > 2 ? '120%' : '100%',
+  // },
   contactView: {
     // flex:1,
     // flexDirection:'row',
-    minWidth: '125%',
+    minWidth: '100%',
+    // minWidth,
     padding: moderateScale(10),
     // paddingHorizontal: horizontalScale(10),
     marginTop: verticalScale(10),
     alignItems: 'center',
   },
   addContact: {
-    width: '27%',
+    width: '25%',
     height: verticalScale(95),
     borderRadius: moderateScale(10),
     borderWidth: 0.5,

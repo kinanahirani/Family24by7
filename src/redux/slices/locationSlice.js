@@ -3,11 +3,17 @@ import {createSlice} from '@reduxjs/toolkit';
 const locationSlice = createSlice({
   name: 'location',
   initialState: {
-    data: {},
+    latitude: null,
+    longitude: null,
+    address: '',
   },
   reducers: {
     setLocationData(state, action) {
-      state.data = action.payload;
+      const { latitude, longitude, address } = action.payload;
+      console.log(latitude, longitude, address,"..latitude, longitude, address in redux");
+      state.latitude = latitude;
+      state.longitude = longitude;
+      state.address = address;
     },
   },
 });
