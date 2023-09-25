@@ -22,7 +22,7 @@ const SelectCircle = forwardRef((props, ref) => {
       rbSheetRef.current.close();
     },
   }));
-  const [isChecked, setIsChecked] = useState(false);
+  const [isChecked, setIsChecked] = useState(true);
   const navigation = useNavigation();
 
   const handlePress = () => {

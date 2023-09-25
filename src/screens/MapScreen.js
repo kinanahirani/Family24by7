@@ -121,7 +121,7 @@ const MapScreen = () => {
           const addressString = addressComponent
             .map(component => component.long_name)
             .join(', ');
-            
+
           dispatch(
             setLocationData({
               latitude,
@@ -378,7 +378,7 @@ const MapScreen = () => {
             <TouchableOpacity
               style={{padding: moderateScale(5)}}
               onPress={openDrawer}>
-              <Feather name="menu" size={moderateScale(25)} color={'black'} />
+              <Feather name="menu" size={moderateScale(22)} color={'black'} />
             </TouchableOpacity>
 
             <TouchableOpacity

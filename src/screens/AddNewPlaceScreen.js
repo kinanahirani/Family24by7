@@ -55,6 +55,7 @@ const AddNewPlaceScreen = ({navigation}) => {
   const [moving, setMoving] = useState(false);
   const [timeout, setTimeout] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [existingPlaces, setExistingPlaces] = useState([]);
 
   useEffect(() => {
     console.log(locationLatitude, '...locationLatitude');
@@ -63,6 +64,30 @@ const AddNewPlaceScreen = ({navigation}) => {
     console.log(circle, '..circle');
     console.log(userData, '..circle');
   }, []);
+
+  useEffect(() => {
+    const fetchExistingPlaces = async () => {
+      try {
+        const circleCode = circle.joinedCircles[0].circleCode;
+        const placesCollectionRef = firestore()
+          .collection('places')
+          .doc(circleCode)
+          .collection('addedPlaces');
+
+        const placesOfTheCircle = await placesCollectionRef.get();
+        const placesData = placesOfTheCircle.docs.map(doc => ({
+          id: doc.id,
+          ...doc.data(),
+        }));
+
+        setExistingPlaces(placesData);
+      } catch (error) {
+        console.error('Error fetching existing places:', error);
+      }
+    };
+
+    fetchExistingPlaces();
+  }, [circle]);
 
   const handleSliderChange = value => {
     if (value < 328) {
@@ -122,6 +147,29 @@ const AddNewPlaceScreen = ({navigation}) => {
       }
       setLoading(false);
     }
+  };
+
+  const calculateDistance = (point1, point2) => {
+    // Calculate the distance between two points using the Haversine formula
+    const radianFactor = Math.PI / 180;
+    const lat1 = point1.latitude * radianFactor;
+    const lon1 = point1.longitude * radianFactor;
+    const lat2 = point2.latitude * radianFactor;
+    const lon2 = point2.longitude * radianFactor;
+
+    const deltaLat = lat2 - lat1;
+    const deltaLon = lon2 - lon1;
+
+    const a =
+      Math.sin(deltaLat / 2) ** 2 +
+      Math.cos(lat1) * Math.cos(lat2) * Math.sin(deltaLon / 2) ** 2;
+
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+
+    const earthRadius = 6371000; // Earth's radius in meters
+    const distance = earthRadius * c;
+
+    return distance;
   };
 
   const sendNotifications = async () => {
@@ -228,9 +276,60 @@ const AddNewPlaceScreen = ({navigation}) => {
               });
               console.log(markerPosition, '....markerPosition');
               setMoving(false);
+
+              const newCircleCenter = {
+                latitude: region.latitude,
+                longitude: region.longitude,
+              };
+              const overlapExists = existingPlaces.some(existingPlace => {
+                const existingCircleCenter = {
+                  latitude: existingPlace.latitude,
+                  longitude: existingPlace.longitude,
+                };
+                const distance = calculateDistance(
+                  newCircleCenter,
+                  existingCircleCenter,
+                );
+                const minDistance = radius + existingPlace.radius;
+
+                return distance < minDistance;
+              });
+
+              if (overlapExists) {
+                if (Platform.OS === 'android') {
+                  ToastAndroid.show(
+                    'Place overlaps with existing places. Please choose a different location.',
+                    ToastAndroid.LONG,
+                  );
+                } else {
+                  Alert.alert(
+                    'Place Overlap',
+                    'Place overlaps with existing places. Please choose a different location.',
+                    [{text: 'OK'}],
+                  );
+                }
+                // Optionally, reset the marker position to its previous state
+                setMarkerPosition({
+                  latitude: locationLatitude,
+                  longitude: locationLongitude,
+                });
+              }
             }, 500);
             setTimeout(newTimeout);
           }}>
+          {existingPlaces.map(place => (
+            <Circle
+              key={place.id}
+              center={{
+                latitude: place.latitude,
+                longitude: place.longitude,
+              }}
+              radius={place.radius}
+              strokeWidth={1}
+              strokeColor={'rgba(0, 255, 0, 0.2)'}
+              fillColor={'rgba(0, 255, 0, 0.2)'}
+            />
+          ))}
           {isMapMoving ? null : (
             <Circle
               center={markerPosition}
