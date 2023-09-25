@@ -11,15 +11,24 @@ import {useNavigation} from '@react-navigation/native';
 import {setUserData} from '../redux/slices/userSlice';
 import {useDispatch} from 'react-redux';
 import auth from '@react-native-firebase/auth';
+import messaging from '@react-native-firebase/messaging';
 
 const LoginOptionScreen = () => {
   const navigation = useNavigation();
   const dispatch = useDispatch();
+  const [token, setToken] = useState('');
+
+  async function getToken() {
+    let token = await messaging().getToken();
+    setToken(token);
+  }
+
   useEffect(() => {
     GoogleSignin.configure({
       webClientId:
         '410480316998-prmr4pjok0r0csvuvk5tee8p2rps52h5.apps.googleusercontent.com',
     });
+    getToken();
   }, []);
 
   const googleSignIn = async () => {
@@ -34,6 +43,11 @@ const LoginOptionScreen = () => {
 
         if (userDocSnapshot.exists) {
           userData = userDocSnapshot.data();
+          await firestore()
+            .collection('users')
+            .doc(userData.id)
+            .update({fcmToken: token});
+
           const userCirclesRef = firestore()
             .collection('circles')
             .where('usersOfCircles', 'array-contains', userData.id);
@@ -60,6 +74,7 @@ const LoginOptionScreen = () => {
             id: usrInfo.user.id,
             name: usrInfo.user.name,
             profilePicture: usrInfo.user.photo,
+            fcmToken: token,
           };
           await userDocRef.set(userData);
           dispatch(setUserData(userData));

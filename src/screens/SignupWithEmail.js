@@ -5,7 +5,7 @@ import {
   TouchableOpacity,
   ScrollView,
 } from 'react-native';
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {
   horizontalScale,
   moderateScale,
@@ -19,6 +19,7 @@ import firestore from '@react-native-firebase/firestore';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {setUserData} from '../redux/slices/userSlice';
 import {useDispatch} from 'react-redux';
+import messaging from '@react-native-firebase/messaging';
 
 const SignupWithEmail = () => {
   const dispatch = useDispatch();
@@ -34,11 +35,21 @@ const SignupWithEmail = () => {
     },
   });
   const navigation = useNavigation();
+  const [token, setToken] = useState('');
   const [secureTextEntry, setSecureTextEntry] = useState(true);
 
   const togglePasswordVisibility = () => {
     setSecureTextEntry(prevSecureTextEntry => !prevSecureTextEntry);
   };
+
+  useEffect(() => {
+    getToken();
+  }, []);
+
+  async function getToken() {
+    let token = await messaging().getToken();
+    setToken(token);
+  }
 
   const onSubmit = async data => {
     const {email, password} = data;
@@ -56,7 +67,7 @@ const SignupWithEmail = () => {
             email,
             id,
             password,
-            //   token: token,
+            fcmToken: token,
           });
           const userData = {
             email,

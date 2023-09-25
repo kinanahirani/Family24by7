@@ -7,7 +7,7 @@ import {
   Keyboard,
   Alert,
 } from 'react-native';
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {
   horizontalScale,
   moderateScale,
@@ -20,8 +20,10 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import {useForm, Controller} from 'react-hook-form';
 import {setUserData} from '../redux/slices/userSlice';
 import {useDispatch} from 'react-redux';
+import messaging from '@react-native-firebase/messaging';
 
 const LoginWithEmail = ({navigation}) => {
+  const [token, setToken] = useState('');
   const dispatch = useDispatch();
   const [secureTextEntry, setSecureTextEntry] = useState(true);
 
@@ -35,6 +37,14 @@ const LoginWithEmail = ({navigation}) => {
       password: '',
     },
   });
+
+  async function getToken() {
+    let token = await messaging().getToken();
+    setToken(token);
+  }
+  useEffect(() => {
+    getToken();
+  }, []);
 
   const togglePasswordVisibility = () => {
     setSecureTextEntry(prevSecureTextEntry => !prevSecureTextEntry);
@@ -52,9 +62,16 @@ const LoginWithEmail = ({navigation}) => {
           .collection('users')
           .doc(user.uid)
           .get();
+
         if (userDoc.exists) {
           const userData = userDoc.data();
           console.log(userData, 'userData');
+
+          await firestore()
+            .collection('users')
+            .doc(user.uid)
+            .update({fcmToken: token});
+
           const userCirclesRef = firestore()
             .collection('circles')
             .where('usersOfCircles', 'array-contains', userData.id);

@@ -46,7 +46,7 @@ const MapScreen = () => {
   const [bottomSheetVisible, setBottomSheetVisible] = useState(false);
   const [usersData, setUsersData] = useState([]);
   const dispatch = useDispatch();
-  const circle = useSelector(state => state.circleData.data);
+  const circle = useSelector(state => state.circle.data);
   Geocoder.init('AIzaSyB09PIaNrUXMikGy415TQ3tCqYy8uXbpTs');
 
   // useEffect(() => {

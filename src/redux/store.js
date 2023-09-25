@@ -6,30 +6,36 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import circleDataSlice from './slices/circleDataSlice';
 import contactSlice from './slices/contactSlice';
 import locationSlice from './slices/locationSlice';
+import rootReducer from './rootReducer';
 
 const persistConfig = {
   key: 'root',
   storage: AsyncStorage,
   stateReconciler: autoMergeLevel2,
-  whiteList: ['user'],
+  whiteList: ['user', 'circleData'],
 };
 
-const persistedReducer = persistReducer(persistConfig, userSlice);
-const persistedContactReducer = persistReducer(persistConfig, contactSlice);
+// const persistedReducer = persistReducer(persistConfig, userSlice);
+// const persistedContactReducer = persistReducer(persistConfig, contactSlice);
+const persistedReducer = persistReducer(persistConfig, rootReducer);
 
 // const persistedCircleDataReducer = persistReducer(persistConfig, circleDataSlice);
 
-const rootReducer = combineReducers({
-  user: persistedReducer,
-  // circleData: persistedCircleDataReducer,
-  circleData: circleDataSlice,
-  location:locationSlice
-  // contactData: persistedContactReducer
+// const rootReducer = combineReducers({
+//   user: persistedReducer,
+//   // circleData: persistedCircleDataReducer,
+//   circleData: circleDataSlice,
+//   location:locationSlice
+//   // contactData: persistedContactReducer
+// });
+
+// const store = configureStore({
+//   reducer: rootReducer,
+// });
+const store = configureStore({
+  reducer: persistedReducer,
 });
 
-const store = configureStore({
-  reducer: rootReducer,
-});
 
 export default store;
 export const persistVal = persistStore(store);

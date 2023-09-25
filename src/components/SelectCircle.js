@@ -88,20 +88,20 @@ const SelectCircle = forwardRef((props, ref) => {
                   <MaterialCommunityIcons
                     name="checkbox-marked-circle-outline"
                     color={'rgba(119, 79, 251, 255)'}
-                    size={22}
+                    size={moderateScale(22)}
                   />
                 ) : (
                   <MaterialCommunityIcons
                     name="checkbox-blank-circle-outline"
                     color={'rgba(119, 79, 251, 255)'}
-                    size={22}
+                    size={moderateScale(22)}
                   />
                 )}
               </TouchableOpacity>
               <Ionicons
                 name="settings-sharp"
                 color={'gray'}
-                size={22}
+                size={moderateScale(22)}
                 style={{marginLeft: horizontalScale(20)}}
               />
             </View>
