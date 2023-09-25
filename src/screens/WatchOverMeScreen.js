@@ -6,8 +6,9 @@ import {
   Text,
   TouchableOpacity,
   View,
+  SafeAreaView,
 } from 'react-native';
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import {
   horizontalScale,
@@ -16,11 +17,11 @@ import {
 } from '../helpers/sizeHelpers';
 import {TextInput} from 'react-native-paper';
 import {useSelector} from 'react-redux';
-import SendSMS from 'react-native-sms'
+import SendSMS from 'react-native-sms';
 import {GooglePlacesAutocomplete} from 'react-native-google-places-autocomplete';
 
 const WatchOverMeScreen = ({navigation}) => {
-  const startLocation = useSelector(state => state.location.data);
+  const startLocation = useSelector(state => state.location.address);
   const [destination, setDestination] = useState('');
   const [location, setLocation] = useState(startLocation ? startLocation : '');
   const [message, setMessage] = useState('');
@@ -28,10 +29,13 @@ const WatchOverMeScreen = ({navigation}) => {
   const [isSearching, setIsSearching] = useState(false);
   const toggleSwitch = () => setIsEnabled(previousState => !previousState);
 
+  useEffect(() => {
+    console.log(startLocation, 'startLocation');
+  }, []);
   return (
     <>
-      <KeyboardAvoidingView style={{flex: 1}} behavior="height">
-        <View style={styles.container}>
+      <SafeAreaView style={{flexGrow: 1, backgroundColor: 'white'}}>
+        <KeyboardAvoidingView behavior="height">
           <View
             style={{
               flexDirection: 'row',
@@ -81,6 +85,7 @@ const WatchOverMeScreen = ({navigation}) => {
 
             <TextInput
               multiline
+              numberOfLines={3}
               mode="outlined"
               label="Start Location"
               style={[styles.textInput, {marginTop: verticalScale(20)}]}
@@ -122,8 +127,9 @@ const WatchOverMeScreen = ({navigation}) => {
               <Text>{`${message.length}/200`}</Text>
             </View>
           </View>
-        </View>
-      </KeyboardAvoidingView>
+          <View style={{height: verticalScale(130)}} />
+        </KeyboardAvoidingView>
+      </SafeAreaView>
 
       <View>
         <View

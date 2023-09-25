@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from 'react';
-import {StyleSheet, Text, View, Image, TouchableOpacity, ActivityIndicator} from 'react-native';
+import {StyleSheet, Text, View, Image, TouchableOpacity, ActivityIndicator, SafeAreaView} from 'react-native';
 import ImageCropPicker from 'react-native-image-crop-picker';
 import {useDispatch, useSelector} from 'react-redux';
 import {TextInput, HelperText} from 'react-native-paper';
@@ -139,7 +139,7 @@ const EnterUserDetails = ({navigation}) => {
   };
 
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container}>
       <View
         style={{
           flexDirection: 'row',
@@ -250,7 +250,7 @@ const EnterUserDetails = ({navigation}) => {
           )}
         </TouchableOpacity>
       </View>
-    </View>
+    </SafeAreaView>
   );
 };
 

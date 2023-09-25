@@ -5,6 +5,7 @@ import {
   TouchableOpacity,
   View,
   Linking,
+  SafeAreaView
 } from 'react-native';
 import React, {useEffect, useState} from 'react';
 import {
@@ -104,7 +105,7 @@ const SendAlertScreen = ({navigation}) => {
 
   return (
     <>
-      <View style={styles.container}>
+      <SafeAreaView style={styles.container}>
         {/* <View
           style={{
             alignItems: 'center',
@@ -189,7 +190,7 @@ const SendAlertScreen = ({navigation}) => {
             />
           </View>
         </View>
-      </View>
+      </SafeAreaView>
 
       <TouchableOpacity
         activeOpacity={1}

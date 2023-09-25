@@ -52,20 +52,59 @@ const AddPlaceScreen = () => {
     fetchData();
   }, [isFocused]);
 
-  const toggleSwitch = (itemId, switchType) => {
+  const updateFirestoreSwitchState = async (itemId, switchType, value) => {
+    const placeRef = firestore()
+      .collection('places')
+      .doc(circleData.joinedCircles[0].circleCode)
+      .collection('addedPlaces')
+      .doc(itemId);
+
+    try {
+      await placeRef.update({
+        [switchType]: value,
+      });
+      console.log(`Updated ${switchType} in Firestore for ${itemId}`);
+    } catch (error) {
+      console.error(`Error updating ${switchType} in Firestore:`, error);
+    }
+  };
+
+  const handleSwitchToggle = (itemId, switchType) => {
     const updatedPlaces = places.map(place =>
       place.id === itemId
         ? {
             ...place,
-            switchEnabled:
-              switchType === 'alert'
-                ? !place.switchEnabled
-                : place.switchEnabled,
+            [switchType]: !place[switchType],
           }
         : place,
     );
 
     setPlaces(updatedPlaces);
+    updateFirestoreSwitchState(
+      itemId,
+      switchType,
+      !places.find(place => place.id === itemId)[switchType],
+    );
+  };
+
+  const deletePlace = async itemId => {
+    // Remove the place from the local state
+    const updatedPlaces = places.filter(place => place.id !== itemId);
+    setPlaces(updatedPlaces);
+
+    // Delete the place from Firestore
+    const placeRef = firestore()
+      .collection('places')
+      .doc(circleData.joinedCircles[0].circleCode)
+      .collection('addedPlaces')
+      .doc(itemId);
+
+    try {
+      await placeRef.delete();
+      console.log(`Deleted place with ID ${itemId} from Firestore`);
+    } catch (error) {
+      console.error(`Error deleting place from Firestore:`, error);
+    }
   };
 
   const renderItem = ({item}) => {
@@ -92,7 +131,9 @@ const AddPlaceScreen = () => {
               }}>
               {item.name}
             </Text>
-            <TouchableOpacity>
+            <TouchableOpacity
+              onPress={() => deletePlace(item.id)}
+              activeOpacity={0.7}>
               <MaterialCommunityIcons
                 name="delete-outline"
                 color={'black'}
@@ -106,7 +147,6 @@ const AddPlaceScreen = () => {
               flexDirection: 'row',
               alignItems: 'center',
               justifyContent: 'space-between',
-              // backgroundColor: 'red',
               paddingHorizontal: horizontalScale(45),
               marginTop: verticalScale(15),
             }}>
@@ -115,9 +155,9 @@ const AddPlaceScreen = () => {
             </Text>
             <Switch
               trackColor={{false: '#767577', true: 'rgba(119,79,251,0.4)'}}
-              thumbColor={alertEnabled ? 'rgba(119,79,251,255)' : '#f4f3f4'}
-              onValueChange={value => setAlertEnable(value)}
-              value={alertEnabled}
+              thumbColor={item.getAlerts ? 'rgba(119,79,251,255)' : '#f4f3f4'}
+              onValueChange={value => handleSwitchToggle(item.id, 'getAlerts')}
+              value={item.getAlerts}
             />
           </View>
           <TouchableOpacity>
@@ -144,9 +184,9 @@ const AddPlaceScreen = () => {
             </Text>
             <Switch
               trackColor={{false: '#767577', true: 'rgba(119,79,251,0.4)'}}
-              thumbColor={showOnMapEnabled ? 'rgba(119,79,251,255)' : '#f4f3f4'}
-              onValueChange={value => setShowOnMapEnabled(value)}
-              value={showOnMapEnabled}
+              thumbColor={item.showOnMap ? 'rgba(119,79,251,255)' : '#f4f3f4'}
+              onValueChange={value => handleSwitchToggle(item.id, 'showOnMap')}
+              value={item.showOnMap}
             />
           </View>
         </View>
@@ -193,7 +233,6 @@ const AddPlaceScreen = () => {
               alignItems: 'center',
               justifyContent: 'center',
               flex: 1,
-              // backgroundColor: 'red',
             }}>
             <Text
               style={{
@@ -226,43 +265,6 @@ const AddPlaceScreen = () => {
             </TouchableOpacity>
           </View>
         )}
-        {/* <View
-          style={{
-            alignItems: 'center',
-            justifyContent: 'center',
-            flex: 1,
-            // backgroundColor: 'red',
-          }}>
-          <Text
-            style={{
-              width: '90%',
-              textAlign: 'center',
-              fontSize: moderateScale(14),
-            }}>
-            Add places to get notified when circle members enter or leave the
-            place (2 free places)
-          </Text>
-          <TouchableOpacity
-            onPress={() => navigation.navigate('AddNewPlace')}
-            activeOpacity={1}
-            style={{
-              backgroundColor: 'rgba(119,79,251,255)',
-              marginTop: verticalScale(15),
-              width: horizontalScale(90),
-              height: verticalScale(60),
-              justifyContent: 'center',
-              alignItems: 'center',
-              borderRadius: moderateScale(10),
-            }}>
-            <Text
-              style={{
-                color: 'white',
-                fontSize: moderateScale(13),
-              }}>
-              Add place
-            </Text>
-          </TouchableOpacity>
-        </View> */}
       </View>
       <TouchableOpacity
         onPress={() => navigation.navigate('AddNewPlace')}

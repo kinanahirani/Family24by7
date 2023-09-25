@@ -1,4 +1,4 @@
-import {Image, StyleSheet, Text, TouchableOpacity, View} from 'react-native';
+import {Image, StyleSheet, Text, TouchableOpacity, View, SafeAreaView} from 'react-native';
 import React, {useEffect, useState} from 'react';
 import {moderateScale, verticalScale} from '../helpers/sizeHelpers';
 import {
@@ -104,7 +104,7 @@ const LoginOptionScreen = () => {
   };
 
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container}>
       <View style={{alignItems: 'center', flex: 1}}>
         <Text
           style={{
@@ -156,7 +156,7 @@ const LoginOptionScreen = () => {
           your consent.
         </Text>
       </View>
-    </View>
+    </SafeAreaView>
   );
 };
 

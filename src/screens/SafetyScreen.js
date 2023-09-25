@@ -7,6 +7,7 @@ import {
   Modal,
   Pressable,
   PermissionsAndroid,
+  SafeAreaView
 } from 'react-native';
 import React, {useEffect, useState} from 'react';
 import {
@@ -128,7 +129,7 @@ const SafetyScreen = () => {
 
   return (
     <>
-      <View style={styles.container}>
+      <SafeAreaView style={styles.container}>
         <View style={styles.header}>
           <Text style={styles.headerTxt}>Safety</Text>
         </View>
@@ -338,7 +339,7 @@ const SafetyScreen = () => {
             </View>
           </View>
         </Modal>
-      </View>
+      </SafeAreaView>
 
       <View style={styles.bottomView}>
         <TouchableOpacity

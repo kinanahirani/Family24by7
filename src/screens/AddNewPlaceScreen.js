@@ -8,6 +8,7 @@ import {
   Platform,
   ToastAndroid,
   Alert,
+  ActivityIndicator,
 } from 'react-native';
 import MapView, {Circle, Marker, Overlay} from 'react-native-maps';
 import Slider from 'react-native-slider';
@@ -53,6 +54,7 @@ const AddNewPlaceScreen = ({navigation}) => {
   const [isMapMoving, setIsMapMoving] = useState(false);
   const [moving, setMoving] = useState(false);
   const [timeout, setTimeout] = useState(null);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     console.log(locationLatitude, '...locationLatitude');
@@ -88,7 +90,9 @@ const AddNewPlaceScreen = ({navigation}) => {
   // };
 
   const saveNewPlace = async () => {
+    setLoading(true);
     if (placeName == '') {
+      setLoading(false);
       if (Platform.OS === 'android') {
         ToastAndroid.show('Enter proper name', ToastAndroid.SHORT);
       } else {
@@ -116,6 +120,7 @@ const AddNewPlaceScreen = ({navigation}) => {
       if (isEnabled) {
         sendNotifications();
       }
+      setLoading(false);
     }
   };
 
@@ -359,14 +364,18 @@ const AddNewPlaceScreen = ({navigation}) => {
             marginBottom: moderateScale(25),
           }}
           onPress={saveNewPlace}>
-          <Text
-            style={{
-              color: 'white',
-              fontWeight: '500',
-              fontSize: moderateScale(14),
-            }}>
-            SAVE
-          </Text>
+          {loading ? (
+            <ActivityIndicator color="#fff" size="small" />
+          ) : (
+            <Text
+              style={{
+                color: 'white',
+                fontWeight: '500',
+                fontSize: moderateScale(14),
+              }}>
+              SAVE
+            </Text>
+          )}
         </TouchableOpacity>
       </View>
     </PaperProvider>

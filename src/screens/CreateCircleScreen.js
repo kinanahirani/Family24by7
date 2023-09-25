@@ -8,6 +8,7 @@ import {
   Modal,
   Pressable,
   Alert,
+  SafeAreaView
 } from 'react-native';
 import React, {useRef, useState} from 'react';
 import {
@@ -154,7 +155,7 @@ const CreateCircleScreen = ({navigation}) => {
   };
 
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container}>
       <ScrollView>
         <View
           style={{
@@ -300,7 +301,7 @@ const CreateCircleScreen = ({navigation}) => {
           </View>
         </Modal>
       </ScrollView>
-    </View>
+    </SafeAreaView>
   );
 };
 

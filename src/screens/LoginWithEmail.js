@@ -6,6 +6,7 @@ import {
   ScrollView,
   Keyboard,
   Alert,
+  SafeAreaView
 } from 'react-native';
 import React, {useEffect, useState} from 'react';
 import {
@@ -85,11 +86,6 @@ const LoginWithEmail = ({navigation}) => {
             dispatch(setUserData(userData));
             navigation.replace('createcircle');
           }
-
-          // dispatch(setUserData(userData));
-          // navigation.replace('tabbar');
-          // navigation.replace('enteruserdetails');
-          // navigation.replace('createcircle');
         } else {
           Alert.alert('User not found!');
         }
@@ -101,7 +97,7 @@ const LoginWithEmail = ({navigation}) => {
     }
   };
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container}>
       <ScrollView>
         <View>
           <View style={{alignItems: 'center'}}>
@@ -221,7 +217,7 @@ const LoginWithEmail = ({navigation}) => {
           </TouchableOpacity>
         </View>
       </ScrollView>
-    </View>
+    </SafeAreaView>
   );
 };
 

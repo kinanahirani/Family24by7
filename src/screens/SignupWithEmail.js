@@ -4,6 +4,7 @@ import {
   View,
   TouchableOpacity,
   ScrollView,
+  SafeAreaView
 } from 'react-native';
 import React, {useEffect, useState} from 'react';
 import {
@@ -94,7 +95,7 @@ const SignupWithEmail = () => {
   };
 
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container}>
       <ScrollView>
         <View>
           <View style={{alignItems: 'center'}}>
@@ -277,7 +278,7 @@ const SignupWithEmail = () => {
           </Text>
         </View>
       </ScrollView>
-    </View>
+    </SafeAreaView>
   );
 };
 
