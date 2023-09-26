@@ -8,9 +8,9 @@ import {
   Modal,
   Pressable,
   Alert,
-  SafeAreaView
+  SafeAreaView,
 } from 'react-native';
-import React, {useRef, useState} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import {
   horizontalScale,
   moderateScale,
@@ -24,6 +24,8 @@ import {
   generateUniqueCircleCode,
   isCircleCodeUnique,
 } from '../helpers/circleHelpers';
+import {useRoute} from '@react-navigation/native';
+import Ionicons from 'react-native-vector-icons/Ionicons';
 
 const CreateCircleScreen = ({navigation}) => {
   const [code, setCode] = useState(['', '', '', '', '', '']);
@@ -31,8 +33,16 @@ const CreateCircleScreen = ({navigation}) => {
   const [codeChecked, setCodeChecked] = useState(false);
   const [createCircleModalVisible, setCreateCircleModalVisible] =
     useState(false);
-
   const userData = useSelector(state => state.user.data);
+  const route = useRoute();
+  const [cameFromDrawer, setCameFromDrawer] = useState(false);
+  useEffect(() => {
+    if (route.params?.screenName === 'drawer') {
+      setCameFromDrawer(true);
+    } else {
+      setCameFromDrawer(false);
+    }
+  }, [route.params]);
 
   const {
     control,
@@ -117,7 +127,7 @@ const CreateCircleScreen = ({navigation}) => {
 
             console.log('User added to the circle:', userId);
             Alert.alert('You have been added to the circle.');
-            navigation.replace('tabbar');
+            navigation.replace('Home');
           } catch (error) {
             console.error('Error adding user to circle:', error);
           }
@@ -148,7 +158,7 @@ const CreateCircleScreen = ({navigation}) => {
         createdAt: firestore.FieldValue.serverTimestamp(),
       });
       console.log('Circle added with code:', circleCode);
-      navigation.navigate('tabbar');
+      navigation.navigate('Home');
     } catch (error) {
       console.error('Error adding circle:', error);
     }
@@ -157,150 +167,226 @@ const CreateCircleScreen = ({navigation}) => {
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView>
-        <View
-          style={{
-            height: 'auto',
-            alignItems: 'center',
-          }}>
-          <Text
-            style={{
-              fontSize: 20,
-              textAlign: 'center',
-              marginTop: verticalScale(50),
-            }}>
-            Do you want to join a Circle?
-          </Text>
-          <Text style={{fontSize: 20, textAlign: 'center'}}>
-            Enter your invite code
-          </Text>
-          <View style={{marginTop: verticalScale(30)}}>
-            <Text style={{fontSize: 14, textAlign: 'center'}}>
-              Get the code from the person
-            </Text>
-            <Text style={{fontSize: 14, textAlign: 'center'}}>
-              creating your family's Circle
-            </Text>
-          </View>
-
-          {/* code for codeInput */}
-          <View style={styles.codeContainer}>
-            {code.map((digit, index) => (
-              <TextInput
-                key={index}
-                style={styles.codeInput}
-                maxLength={1}
-                value={digit}
-                onChangeText={value => handleCodeChange(index, value)}
-                ref={ref => (codeInputRefs.current[index] = ref)}
-                onSubmitEditing={() => {
-                  if (index < codeInputRefs.current.length - 1) {
-                    codeInputRefs.current[index + 1].focus();
-                  }
-                }}
-              />
-            ))}
-          </View>
-          <View
-            style={{
-              flexDirection: 'row',
-              alignItems: 'center',
-              marginTop: verticalScale(50),
-            }}>
-            <View style={{flex: 1, height: 1, backgroundColor: 'black'}} />
-            <Text
+        {cameFromDrawer ? (
+          <>
+            <View
               style={{
-                marginHorizontal: horizontalScale(7),
-                fontSize: moderateScale(20),
+                flexDirection: 'row',
+                height: moderateScale(50),
+                alignItems: 'center',
+                paddingHorizontal: horizontalScale(16),
+                borderBottomWidth: 0.5,
+                borderBottomColor: 'rgba(128,128,128,0.4)',
               }}>
-              OR
-            </Text>
-            <View style={{flex: 1, height: 1, backgroundColor: 'black'}} />
-          </View>
-        </View>
-        <View
-          style={{
-            height: 'auto',
-            alignItems: 'center',
-            justifyContent: 'center',
-          }}>
-          <Text
-            style={{
-              marginTop: verticalScale(100),
-              fontSize: 20,
-              textAlign: 'center',
-            }}>
-            Do not have any code?
-          </Text>
-          <TouchableOpacity
-            style={[styles.createBtn, {marginTop: moderateScale(30)}]}
-            activeOpacity={0.7}
-            onPress={() => setCreateCircleModalVisible(true)}>
-            <Text style={{color: 'white', fontWeight: '400'}}>
-              Create Circle
-            </Text>
-          </TouchableOpacity>
-          <Text>We will give you a code to share</Text>
-        </View>
+              <TouchableOpacity
+                onPress={() => navigation.goBack()}
+                activeOpacity={0.7}>
+                <Ionicons name="arrow-back" color="black" size={25} />
+              </TouchableOpacity>
+              <Text
+                style={{
+                  marginLeft: 'auto',
+                  marginRight: 'auto',
+                  fontSize: moderateScale(18),
+                  fontWeight: 'bold',
+                  color: 'rgba(15, 24, 40, 1)',
+                }}>
+                Join Circle
+              </Text>
+            </View>
+            <View
+              style={{
+                height: 'auto',
+                alignItems: 'center',
+              }}>
+              <Text
+                style={{
+                  fontSize: moderateScale(15),
+                  textAlign: 'center',
+                  marginTop: verticalScale(10),
+                  padding: moderateScale(15),
+                }}>
+                After joining circle you can checkout circle members, their
+                locations, travels/lists, weather stats etc.
+              </Text>
+              <Text
+                style={{
+                  fontSize: moderateScale(15),
+                  textAlign: 'center',
+                  fontWeight: '500',
+                  marginTop: verticalScale(50),
+                }}>
+                Please enter unique six-digit code
+              </Text>
 
-        {/* Modal */}
-        <Modal
-          animationType="fade"
-          transparent={true}
-          visible={createCircleModalVisible}
-          onRequestClose={() => {
-            setCreateCircleModalVisible(false);
-          }}>
-          <View style={styles.centeredView}>
-            <View style={styles.modalView}>
-              <Text style={styles.modalText}>Name your Circle</Text>
-              <Controller
-                control={control}
-                rules={{
-                  required: 'Please enter circle name.',
-                }}
-                render={({field: {onChange, onBlur, value}}) => (
-                  <>
-                    <TextInput
-                      multiline
-                      mode="flat"
-                      // label="Conatct Number"
-                      onBlur={onBlur}
-                      onChangeText={onChange}
-                      value={value}
-                      style={styles.textInput}
-                      error={errors.circleName}
-                    />
-                    {errors.circleName && (
-                      <HelperText
-                        type="error"
-                        style={{
-                          alignSelf: 'flex-start',
-                          // backgroundColor:'yellow',
-                          marginBottom: verticalScale(10),
-                        }}>
-                        {errors.circleName.message}
-                      </HelperText>
-                    )}
-                  </>
-                )}
-                name="circleName"
-              />
-              <View style={{flexDirection: 'row', alignSelf: 'flex-end'}}>
-                <Pressable
-                  style={[styles.button, {marginRight: horizontalScale(10)}]}
-                  onPress={() => setCreateCircleModalVisible(false)}>
-                  <Text style={styles.textStyle}>BACK</Text>
-                </Pressable>
-                <Pressable
-                  style={[styles.button, {marginLeft: horizontalScale(10)}]}
-                  onPress={handleSubmit(handleCreateCircle)}>
-                  <Text style={styles.textStyle}>CREATE</Text>
-                </Pressable>
+              {/* code for codeInput */}
+              <View style={styles.codeContainer}>
+                {code.map((digit, index) => (
+                  <TextInput
+                    key={index}
+                    style={styles.codeInput}
+                    maxLength={1}
+                    value={digit}
+                    onChangeText={value => handleCodeChange(index, value)}
+                    ref={ref => (codeInputRefs.current[index] = ref)}
+                    onSubmitEditing={() => {
+                      if (index < codeInputRefs.current.length - 1) {
+                        codeInputRefs.current[index + 1].focus();
+                      }
+                    }}
+                  />
+                ))}
               </View>
             </View>
-          </View>
-        </Modal>
+          </>
+        ) : (
+          <>
+            <View
+              style={{
+                height: 'auto',
+                alignItems: 'center',
+              }}>
+              <Text
+                style={{
+                  fontSize: 20,
+                  textAlign: 'center',
+                  marginTop: verticalScale(50),
+                }}>
+                Do you want to join a Circle?
+              </Text>
+              <Text style={{fontSize: 20, textAlign: 'center'}}>
+                Enter your invite code
+              </Text>
+              <View style={{marginTop: verticalScale(30)}}>
+                <Text style={{fontSize: 14, textAlign: 'center'}}>
+                  Get the code from the person
+                </Text>
+                <Text style={{fontSize: 14, textAlign: 'center'}}>
+                  creating your family's Circle
+                </Text>
+              </View>
+
+              {/* code for codeInput */}
+              <View style={styles.codeContainer}>
+                {code.map((digit, index) => (
+                  <TextInput
+                    key={index}
+                    style={styles.codeInput}
+                    maxLength={1}
+                    value={digit}
+                    onChangeText={value => handleCodeChange(index, value)}
+                    ref={ref => (codeInputRefs.current[index] = ref)}
+                    onSubmitEditing={() => {
+                      if (index < codeInputRefs.current.length - 1) {
+                        codeInputRefs.current[index + 1].focus();
+                      }
+                    }}
+                  />
+                ))}
+              </View>
+              <View
+                style={{
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  marginTop: verticalScale(50),
+                }}>
+                <View style={{flex: 1, height: 1, backgroundColor: 'black'}} />
+                <Text
+                  style={{
+                    marginHorizontal: horizontalScale(7),
+                    fontSize: moderateScale(20),
+                  }}>
+                  OR
+                </Text>
+                <View style={{flex: 1, height: 1, backgroundColor: 'black'}} />
+              </View>
+            </View>
+            <View
+              style={{
+                height: 'auto',
+                alignItems: 'center',
+                justifyContent: 'center',
+              }}>
+              <Text
+                style={{
+                  marginTop: verticalScale(100),
+                  fontSize: 20,
+                  textAlign: 'center',
+                }}>
+                Do not have any code?
+              </Text>
+              <TouchableOpacity
+                style={[styles.createBtn, {marginTop: moderateScale(30)}]}
+                activeOpacity={0.7}
+                onPress={() => setCreateCircleModalVisible(true)}>
+                <Text style={{color: 'white', fontWeight: '400'}}>
+                  Create Circle
+                </Text>
+              </TouchableOpacity>
+              <Text>We will give you a code to share</Text>
+            </View>
+          </>
+        )}
       </ScrollView>
+
+      {/* Modal */}
+      <Modal
+        animationType="fade"
+        transparent={true}
+        visible={createCircleModalVisible}
+        onRequestClose={() => {
+          setCreateCircleModalVisible(false);
+        }}>
+        <View style={styles.centeredView}>
+          <View style={styles.modalView}>
+            <Text style={styles.modalText}>Name your Circle</Text>
+            <Controller
+              control={control}
+              rules={{
+                required: 'Please enter circle name.',
+              }}
+              render={({field: {onChange, onBlur, value}}) => (
+                <>
+                  <TextInput
+                    multiline
+                    mode="flat"
+                    // label="Conatct Number"
+                    onBlur={onBlur}
+                    onChangeText={onChange}
+                    value={value}
+                    style={styles.textInput}
+                    error={errors.circleName}
+                  />
+                  {errors.circleName && (
+                    <HelperText
+                      type="error"
+                      style={{
+                        alignSelf: 'flex-start',
+                        // backgroundColor:'yellow',
+                        marginBottom: verticalScale(10),
+                      }}>
+                      {errors.circleName.message}
+                    </HelperText>
+                  )}
+                </>
+              )}
+              name="circleName"
+            />
+            <View style={{flexDirection: 'row', alignSelf: 'flex-end'}}>
+              <Pressable
+                style={[styles.button, {marginRight: horizontalScale(10)}]}
+                onPress={() => setCreateCircleModalVisible(false)}>
+                <Text style={styles.textStyle}>BACK</Text>
+              </Pressable>
+              <Pressable
+                style={[styles.button, {marginLeft: horizontalScale(10)}]}
+                onPress={handleSubmit(handleCreateCircle)}>
+                <Text style={styles.textStyle}>CREATE</Text>
+              </Pressable>
+            </View>
+          </View>
+        </View>
+      </Modal>
     </SafeAreaView>
   );
 };

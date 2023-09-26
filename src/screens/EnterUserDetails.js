@@ -115,7 +115,7 @@ const EnterUserDetails = ({navigation}) => {
         dispatch(setUserData({...userData, mobileNumber: contactValue}));
       }
       setLoading(false);
-      navigation.navigate('tabbar');
+      navigation.navigate('Home');
     } catch (error) {
       console.log('Error(handleSave):', error);
       setLoading(false);

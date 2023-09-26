@@ -23,8 +23,6 @@ const AddPlaceScreen = () => {
   const navigation = useNavigation();
   const isFocused = useIsFocused();
   const [places, setPlaces] = useState([]);
-  const [alertEnabled, setAlertEnable] = useState(true);
-  const [showOnMapEnabled, setShowOnMapEnabled] = useState(true);
   const circleData = useSelector(state => state.circle.data);
 
   useEffect(() => {

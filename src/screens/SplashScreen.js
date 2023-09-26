@@ -12,7 +12,7 @@ const SplashScreen = () => {
   useEffect(()=>{
     setTimeout(() => {
     if (userData && userData.name) {
-      navigation.replace('tabbar');
+      navigation.replace('Home');
     } else {
       navigation.replace('loginoptions');
     }

@@ -60,7 +60,7 @@ const LoginOptionScreen = () => {
 
           if (!querySnapshot.empty) {
             dispatch(setUserData(userData));
-            navigation.replace('tabbar');
+            navigation.replace('Home');
           } else {
             dispatch(setUserData(userData));
             navigation.replace('createcircle');

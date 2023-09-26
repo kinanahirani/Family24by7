@@ -4,7 +4,7 @@ import {
   View,
   TouchableOpacity,
   ScrollView,
-  SafeAreaView
+  SafeAreaView,
 } from 'react-native';
 import React, {useEffect, useState} from 'react';
 import {
@@ -174,6 +174,8 @@ const SignupWithEmail = () => {
                   onBlur={onBlur}
                   onChangeText={onChange}
                   value={value}
+                  keyboardType="email-address"
+                  autoCapitalize="none"
                 />
               )}
               name="email"

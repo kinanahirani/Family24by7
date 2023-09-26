@@ -6,7 +6,7 @@ import {
   ScrollView,
   Keyboard,
   Alert,
-  SafeAreaView
+  SafeAreaView,
 } from 'react-native';
 import React, {useEffect, useState} from 'react';
 import {
@@ -81,7 +81,7 @@ const LoginWithEmail = ({navigation}) => {
 
           if (!querySnapshot.empty) {
             dispatch(setUserData(userData));
-            navigation.replace('tabbar');
+            navigation.replace('Home');
           } else {
             dispatch(setUserData(userData));
             navigation.replace('createcircle');
@@ -133,6 +133,8 @@ const LoginWithEmail = ({navigation}) => {
                   onChangeText={onChange}
                   value={value}
                   error={errors.email}
+                  keyboardType="email-address"
+                  autoCapitalize="none"
                 />
               )}
               name="email"
