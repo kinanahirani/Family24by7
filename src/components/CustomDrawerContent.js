@@ -21,8 +21,11 @@ import SelectCircle from './SelectCircle';
 import {Controller, useForm} from 'react-hook-form';
 import {HelperText, TextInput} from 'react-native-paper';
 import {generateUniqueCircleCode} from '../helpers/circleHelpers';
+import firestore from '@react-native-firebase/firestore';
+import {useSelector} from 'react-redux';
 
 const CustomDrawerContent = props => {
+  const userData = useSelector(state => state.user.data);
   const refRBSheet = useRef();
   const navigation = useNavigation();
   const [isCreateCircleModalVisible, setCreateCircleModalVisible] =
@@ -63,6 +66,10 @@ const CustomDrawerContent = props => {
         createdAt: firestore.FieldValue.serverTimestamp(),
       });
       console.log('Circle added with code:', circleCode);
+      const userDocRef = firestore().collection('users').doc(userData.id);
+      await userDocRef.update({
+        activeCircleCode: circleCode,
+      });
       navigation.navigate('Home');
     } catch (error) {
       console.error('Error adding circle:', error);

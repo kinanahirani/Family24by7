@@ -53,7 +53,7 @@ const CustomTabNavigator = () => {
         headerShown: false,
         tabBarShowLabel: true,
         tabBarStyle: {
-          height: verticalScale(60),
+          height: verticalScale(65),
           width: '100%',
         },
         tabBarItemStyle: {

@@ -7,6 +7,7 @@ import {
   Keyboard,
   Alert,
   SafeAreaView,
+  ActivityIndicator,
 } from 'react-native';
 import React, {useEffect, useState} from 'react';
 import {
@@ -27,6 +28,7 @@ const LoginWithEmail = ({navigation}) => {
   const [token, setToken] = useState('');
   const dispatch = useDispatch();
   const [secureTextEntry, setSecureTextEntry] = useState(true);
+  const [loading, setLoading] = useState(false);
 
   const {
     control,
@@ -55,6 +57,7 @@ const LoginWithEmail = ({navigation}) => {
     Keyboard.dismiss();
     const {email, password} = data;
     try {
+      setLoading(true);
       const {user} = await auth().signInWithEmailAndPassword(email, password);
 
       if (user) {
@@ -94,6 +97,8 @@ const LoginWithEmail = ({navigation}) => {
       }
     } catch (error) {
       Alert.alert('Login Error:', error.message);
+    }finally {
+      setLoading(false); 
     }
   };
   return (
@@ -201,7 +206,11 @@ const LoginWithEmail = ({navigation}) => {
             style={[styles.loginButtons, {marginTop: moderateScale(30)}]}
             activeOpacity={0.7}
             onPress={handleSubmit(onSubmit)}>
-            <Text style={styles.loginText}>Continue</Text>
+            {loading ? (
+              <ActivityIndicator color="#fff" size="small" />
+            ) : (
+              <Text style={styles.loginText}>Continue</Text>
+            )}
           </TouchableOpacity>
           <TouchableOpacity
             onPress={() => navigation.navigate('signupwithemail')}

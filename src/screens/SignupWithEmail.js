@@ -5,6 +5,7 @@ import {
   TouchableOpacity,
   ScrollView,
   SafeAreaView,
+  ActivityIndicator,
 } from 'react-native';
 import React, {useEffect, useState} from 'react';
 import {
@@ -38,6 +39,7 @@ const SignupWithEmail = () => {
   const navigation = useNavigation();
   const [token, setToken] = useState('');
   const [secureTextEntry, setSecureTextEntry] = useState(true);
+  const [loading, setLoading] = useState(false);
 
   const togglePasswordVisibility = () => {
     setSecureTextEntry(prevSecureTextEntry => !prevSecureTextEntry);
@@ -55,6 +57,7 @@ const SignupWithEmail = () => {
   const onSubmit = async data => {
     const {email, password} = data;
     try {
+      setLoading(true);
       const {user} = await auth().createUserWithEmailAndPassword(
         email,
         password,
@@ -91,6 +94,8 @@ const SignupWithEmail = () => {
         console.log('That email address is invalid!');
       }
       console.log('Error:', error);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -252,7 +257,11 @@ const SignupWithEmail = () => {
             style={styles.loginButtons}
             activeOpacity={0.7}
             onPress={handleSubmit(onSubmit)}>
-            <Text style={styles.loginText}>Continue</Text>
+            {loading ? (
+              <ActivityIndicator color="#fff" size="small" />
+            ) : (
+              <Text style={styles.loginText}>Continue</Text>
+            )}
           </TouchableOpacity>
           <TouchableOpacity
             onPress={() => navigation.navigate('loginwithemail')}

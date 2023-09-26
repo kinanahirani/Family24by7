@@ -64,6 +64,7 @@ const CDrawerButton = ({
 
   return (
     <TouchableOpacity
+    activeOpacity={0.7}
       style={{
         flexDirection: 'row',
         alignItems: 'center',

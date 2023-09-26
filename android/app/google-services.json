@@ -14,7 +14,15 @@
       },
       "oauth_client": [
         {
-          "client_id": "410480316998-prmr4pjok0r0csvuvk5tee8p2rps52h5.apps.googleusercontent.com",
+          "client_id": "410480316998-f4pabg9l220umsbeeirrt6gcsj5hb1et.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.locationtracker",
+            "certificate_hash": "07d99b65563b0d227ee9a1d6ed6bb26b34efe2a6"
+          }
+        },
+        {
+          "client_id": "410480316998-7dfotb4j283mjpbg5jkmoupe1h3ehab8.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
@@ -27,7 +35,7 @@
         "appinvite_service": {
           "other_platform_oauth_client": [
             {
-              "client_id": "410480316998-prmr4pjok0r0csvuvk5tee8p2rps52h5.apps.googleusercontent.com",
+              "client_id": "410480316998-7dfotb4j283mjpbg5jkmoupe1h3ehab8.apps.googleusercontent.com",
               "client_type": 3
             }
           ]

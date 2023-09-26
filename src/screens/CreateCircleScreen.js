@@ -36,6 +36,7 @@ const CreateCircleScreen = ({navigation}) => {
   const userData = useSelector(state => state.user.data);
   const route = useRoute();
   const [cameFromDrawer, setCameFromDrawer] = useState(false);
+
   useEffect(() => {
     if (route.params?.screenName === 'drawer') {
       setCameFromDrawer(true);
@@ -126,6 +127,10 @@ const CreateCircleScreen = ({navigation}) => {
             });
 
             console.log('User added to the circle:', userId);
+            const userDocRef = firestore().collection('users').doc(userId);
+            await userDocRef.update({
+              activeCircleCode: circleCode,
+            });
             Alert.alert('You have been added to the circle.');
             navigation.replace('Home');
           } catch (error) {
@@ -158,7 +163,11 @@ const CreateCircleScreen = ({navigation}) => {
         createdAt: firestore.FieldValue.serverTimestamp(),
       });
       console.log('Circle added with code:', circleCode);
-      navigation.navigate('Home');
+      const userDocRef = firestore().collection('users').doc(userData.id);
+      await userDocRef.update({
+        activeCircleCode: circleCode,
+      });
+      navigation.replace('Home');
     } catch (error) {
       console.error('Error adding circle:', error);
     }

@@ -1,4 +1,10 @@
-import React, {useRef, forwardRef, useImperativeHandle, useState} from 'react';
+import React, {
+  useRef,
+  forwardRef,
+  useImperativeHandle,
+  useState,
+  useEffect,
+} from 'react';
 import {View, Button, Text, TouchableOpacity} from 'react-native';
 import RBSheet from 'react-native-raw-bottom-sheet';
 import {
@@ -10,9 +16,33 @@ import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityI
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import CBottomSheetButton from './CBottomSheetButton';
 import {useNavigation} from '@react-navigation/native';
+import {useSelector} from 'react-redux';
+import firestore from '@react-native-firebase/firestore';
 
 const SelectCircle = forwardRef((props, ref) => {
   const rbSheetRef = useRef();
+  const userData = useSelector(state => state.user.data);
+  const [joinedCircleList, setJoinedCircleList] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const circleList = async () => {
+      try {
+        const joinedCircles = await firestore()
+          .collection('circles')
+          .where('usersOfCircles', 'array-contains', userData.id)
+          .get();
+
+        const circleData = joinedCircles.docs.map(doc => doc.data());
+        setJoinedCircleList(circleData);
+        setLoading(false);
+      } catch (err) {
+        console.log('Error(circleList): ', err);
+        setLoading(false);
+      }
+    };
+    circleList();
+  }, []);
 
   useImperativeHandle(ref, () => ({
     open: () => {
@@ -63,56 +93,70 @@ const SelectCircle = forwardRef((props, ref) => {
             }}>
             Select Circle
           </Text>
-
-          <View
-            style={{
-              flexDirection: 'row',
-              alignItems: 'center',
-              justifyContent: 'space-between',
-              paddingHorizontal: horizontalScale(15),
-              borderBottomWidth: moderateScale(0.5),
-              borderBottomColor: 'rgba(128,128,128,0.3)',
-              paddingVertical: moderateScale(8),
-            }}>
-            <Text
-              style={{
-                color: 'black',
-                fontWeight: 'bold',
-                fontSize: moderateScale(14),
-              }}>
-              Kinana Hirani's circle
-            </Text>
-            <View style={{flexDirection: 'row'}}>
-              <TouchableOpacity onPress={handlePress}>
-                {isChecked ? (
-                  <MaterialCommunityIcons
-                    name="checkbox-marked-circle-outline"
-                    color={'rgba(119, 79, 251, 255)'}
-                    size={moderateScale(22)}
-                  />
-                ) : (
-                  <MaterialCommunityIcons
-                    name="checkbox-blank-circle-outline"
-                    color={'rgba(119, 79, 251, 255)'}
-                    size={moderateScale(22)}
-                  />
-                )}
-              </TouchableOpacity>
-              <Ionicons
-                name="settings-sharp"
-                color={'gray'}
-                size={moderateScale(22)}
-                style={{marginLeft: horizontalScale(20)}}
-              />
-            </View>
-          </View>
+          {loading ? (
+            <Text>Loading circles...</Text>
+          ) : (
+            <>
+              {joinedCircleList && joinedCircleList.length > 0 ? (
+                joinedCircleList.map((circle, index) => (
+                  <View
+                    key={index}
+                    style={{
+                      flexDirection: 'row',
+                      alignItems: 'center',
+                      justifyContent: 'space-between',
+                      paddingHorizontal: horizontalScale(15),
+                      borderBottomWidth: moderateScale(0.5),
+                      borderBottomColor: 'rgba(128,128,128,0.3)',
+                      paddingVertical: moderateScale(8),
+                    }}>
+                    <Text
+                      style={{
+                        color: 'black',
+                        fontWeight: 'bold',
+                        fontSize: moderateScale(14),
+                      }}>
+                      {circle.circleName}
+                    </Text>
+                    <View style={{flexDirection: 'row'}}>
+                      <TouchableOpacity onPress={handlePress}>
+                        {isChecked ? (
+                          <MaterialCommunityIcons
+                            name="checkbox-marked-circle-outline"
+                            color={'rgba(119, 79, 251, 255)'}
+                            size={moderateScale(22)}
+                          />
+                        ) : (
+                          <MaterialCommunityIcons
+                            name="checkbox-blank-circle-outline"
+                            color={'rgba(119, 79, 251, 255)'}
+                            size={moderateScale(22)}
+                          />
+                        )}
+                      </TouchableOpacity>
+                      <Ionicons
+                        name="settings-sharp"
+                        color={'gray'}
+                        size={moderateScale(22)}
+                        style={{marginLeft: horizontalScale(20)}}
+                      />
+                    </View>
+                  </View>
+                ))
+              ) : (
+                <View>
+                  <Text>No circles found!</Text>
+                </View>
+              )}
+            </>
+          )}
           <View
             style={{
               flexDirection: 'row',
               justifyContent: 'space-evenly',
               marginTop: verticalScale(20),
             }}>
-            <CBottomSheetButton text="Add circle"/>
+            <CBottomSheetButton text="Add circle" />
             <CBottomSheetButton
               text="Join Circle"
               onPress={() => navigation.navigate('createcircle')}
