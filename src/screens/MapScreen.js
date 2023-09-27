@@ -49,65 +49,6 @@ const MapScreen = () => {
   const circle = useSelector(state => state.circle.data);
   Geocoder.init('AIzaSyB09PIaNrUXMikGy415TQ3tCqYy8uXbpTs');
 
-  // useEffect(() => {
-  //   const fetchData = async () => {
-  //     await getCurrentLocation();
-  //     await getUserCircle();
-  //     // getUsersOfCircles();
-  //   };
-  //   fetchData();
-  // }, []);
-
-  // const getUserCircle = async () => {
-  //   try {
-  //     // const createdCircles = await firestore()
-  //     //   .collection('circles')
-  //     //   .where('createdUserId', '==', userData.id)
-  //     //   .get();
-
-  //     const joinedCircles = await firestore()
-  //       .collection('circles')
-  //       .where('usersOfCircles', 'array-contains', userData.id)
-  //       .get();
-
-  //     const circleData = {
-  //       // createdCircles: createdCircles.docs.map(doc => doc.data()),
-  //       joinedCircles: joinedCircles.docs.map(doc => doc.data()),
-  //     };
-  //     setCircleData(circleData);
-  //     console.log('Circle Data:', circleData);
-
-  //     getUsersOfCircles(circleData);
-  //   } catch (err) {
-  //     console.log('Error(getUserCircle): ', err);
-  //   }
-  // };
-
-  // const getUsersOfCircles = async () => {
-  //   if (
-  //     circleData &&
-  //     circleData.joinedCircles &&
-  //     circleData.joinedCircles.length > 0
-  //   ) {
-  //     const userIds = circleData.joinedCircles[0].usersOfCircles;
-  //     const fetchedUsersData = await Promise.all(
-  //       userIds.map(async userId => {
-  //         const userSnapshot = await firestore()
-  //           .collection('users')
-  //           .doc(userId)
-  //           .get();
-  //         const userData = userSnapshot.data();
-  //         return userData;
-  //       }),
-  //     );
-  //     setUsersData(fetchedUsersData);
-  //     console.log(userIds, '...userIds');
-  //     console.log(fetchedUsersData, '...fetchedUsersData');
-  //   } else {
-  //     console.log('No joined circles found.');
-  //   }
-  // };
-
   useEffect(() => {
     fetchData();
   }, []);
@@ -134,18 +75,7 @@ const MapScreen = () => {
           console.warn('Geocoder Error:', error);
         });
     }
-  }, [latitude, longitude]);
-
-  // const fetchData = async () => {
-  //   try {
-  //     console.log('Fetching user circle data...');
-  //     await getUserCircle();
-  //     await getCurrentLocation();
-  //     await saveLocation();
-  //   } catch (error) {
-  //     console.log('Error fetching data:', error);
-  //   }
-  // };
+  }, [latitude, longitude, circle]);
 
   const fetchData = async () => {
     try {
@@ -162,32 +92,28 @@ const MapScreen = () => {
 
   const getUserCircle = async () => {
     try {
-      const joinedCircles = await firestore()
+      const activeCircle = await firestore()
         .collection('circles')
-        .where('usersOfCircles', 'array-contains', userData.id)
+        .doc(userData.activeCircleCode)
         .get();
 
-      const circleData1 = {
-        joinedCircles: joinedCircles.docs.map(doc => doc.data()),
-      };
+      const activeCircleData = activeCircle.data();
+      console.log(activeCircleData, '...activeCircleData');
 
-      // setCircleData1(circleData1);
-      dispatch(setCircleData(circleData1));
-      console.log('Circle Data:', circleData1);
-
-      if (circleData1.joinedCircles && circleData1.joinedCircles.length > 0) {
-        getUsersOfCircles(circleData1);
+      if (activeCircleData) {
+        // dispatch(setCircleData(activeCircleData));
+        getUsersOfCircles(activeCircleData);
       } else {
-        console.log('No joined circles found.');
+        console.log('Document does not exist');
       }
-      return circleData1;
+      return activeCircleData;
     } catch (err) {
       console.log('Error(getUserCircle): ', err);
     }
   };
 
-  const getUsersOfCircles = async circleData1 => {
-    const userIds = circleData1.joinedCircles[0].usersOfCircles;
+  const getUsersOfCircles = async activeCircleData => {
+    const userIds = activeCircleData.usersOfCircles;
     try {
       const fetchedUsersData = await Promise.all(
         userIds.map(async userId => {
@@ -294,27 +220,42 @@ const MapScreen = () => {
     }
     console.log('Circle: ', circle);
 
-    for (const joinedCircle of circle.joinedCircles) {
-      const locationRef = firestore()
-        .collection('locations')
-        .doc(`${userData.id}-${joinedCircle.circleCode}`)
-        .collection('location_logs');
+    // for (const joinedCircle of circle.joinedCircles) {
+    //   const locationRef = firestore()
+    //     .collection('locations')
+    //     .doc(`${userData.id}-${joinedCircle.circleCode}`)
+    //     .collection('location_logs');
 
-      try {
-        await locationRef.add({
-          latitude,
-          longitude,
-          timestamp: firestore.FieldValue.serverTimestamp(),
-        });
-        console.log(
-          `Location stored in Firestore for ${joinedCircle.circleName}.`,
-        );
-      } catch (error) {
-        console.error(
-          `Error storing location for ${joinedCircle.circleName}:`,
-          error,
-        );
-      }
+    //   try {
+    //     await locationRef.add({
+    //       latitude,
+    //       longitude,
+    //       timestamp: firestore.FieldValue.serverTimestamp(),
+    //     });
+    //     console.log(
+    //       `Location stored in Firestore for ${joinedCircle.circleName}.`,
+    //     );
+    //   } catch (error) {
+    //     console.error(
+    //       `Error storing location for ${joinedCircle.circleName}:`,
+    //       error,
+    //     );
+    //   }
+    // }
+    const locationRef = firestore()
+      .collection('locations')
+      .doc(`${userData.id}-${circle.circleCode}`)
+      .collection('location_logs');
+
+    try {
+      await locationRef.add({
+        latitude,
+        longitude,
+        timestamp: firestore.FieldValue.serverTimestamp(),
+      });
+      console.log(`Location stored in Firestore for ${circle.circleName}.`);
+    } catch (error) {
+      console.error(`Error storing location for ${circle.circleName}:`, error);
     }
     // Geocoder.from(latitude, longitude)
     //   .then(json => {
@@ -386,11 +327,7 @@ const MapScreen = () => {
               activeOpacity={1}
               onPress={() => refRBSheet.current.open()}>
               <Text style={styles.headerTxt}>
-                {circle.createdCircles && circle.createdCircles.length > 0
-                  ? circle.createdCircles[0].circleName
-                  : circle.joinedCircles && circle.joinedCircles.length > 0
-                  ? circle.joinedCircles[0].circleName
-                  : 'No Circle'}
+                {circle ? circle.circleName : 'No Circle'}
               </Text>
               <AntDesign
                 name="caretdown"

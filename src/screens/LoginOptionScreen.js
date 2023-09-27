@@ -1,4 +1,11 @@
-import {Image, StyleSheet, Text, TouchableOpacity, View, SafeAreaView} from 'react-native';
+import {
+  Image,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+  SafeAreaView,
+} from 'react-native';
 import React, {useEffect, useState} from 'react';
 import {moderateScale, verticalScale} from '../helpers/sizeHelpers';
 import {
@@ -50,7 +57,8 @@ const LoginOptionScreen = () => {
 
           const userCirclesRef = firestore()
             .collection('circles')
-            .where('usersOfCircles', 'array-contains', userData.id);
+            .doc(userData.activeCircleCode);
+          // .where('usersOfCircles', 'array-contains', userData.id);
 
           const querySnapshot = await userCirclesRef.get();
 

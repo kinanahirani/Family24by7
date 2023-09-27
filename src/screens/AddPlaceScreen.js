@@ -28,7 +28,8 @@ const AddPlaceScreen = () => {
   useEffect(() => {
     const fetchData = async () => {
       console.log(circleData, '....circleData');
-      const circleCode = circleData.joinedCircles[0].circleCode;
+      // const circleCode = circleData.joinedCircles[0].circleCode;
+      const circleCode = circleData.circleCode;
       const placesCollectionRef = firestore()
         .collection('places')
         .doc(circleCode)
@@ -53,7 +54,8 @@ const AddPlaceScreen = () => {
   const updateFirestoreSwitchState = async (itemId, switchType, value) => {
     const placeRef = firestore()
       .collection('places')
-      .doc(circleData.joinedCircles[0].circleCode)
+      // .doc(circleData.joinedCircles[0].circleCode)
+      .doc(circleData.circleCode)
       .collection('addedPlaces')
       .doc(itemId);
 
@@ -93,7 +95,7 @@ const AddPlaceScreen = () => {
     // Delete the place from Firestore
     const placeRef = firestore()
       .collection('places')
-      .doc(circleData.joinedCircles[0].circleCode)
+      .doc(circleData.circleCode)
       .collection('addedPlaces')
       .doc(itemId);
 

@@ -5,7 +5,8 @@ import {
   TouchableOpacity,
   View,
   Linking,
-  SafeAreaView
+  SafeAreaView,
+  ActivityIndicator,
 } from 'react-native';
 import React, {useEffect, useState} from 'react';
 import {
@@ -24,16 +25,20 @@ const SendAlertScreen = ({navigation}) => {
   const toggleSwitch = () => setIsEnabled(previousState => !previousState);
   const [timer, setTimer] = useState(10);
   const [isRunning, setIsRunning] = useState(true);
-  const [contactData, setContactData] = useState([]);
+  const [contactsToSendMsgs, setContactsToSendMsgs] = useState([]);
   const userData = useSelector(state => state.user.data);
-  // const circleData=useSelector(state=>state.circle.data)
+  const circle = useSelector(state => state.circle.data);
   const route = useRoute();
+  const [loading, setLoading] = useState(false);
 
   const handleTimerTick = () => {
     if (timer === 0) {
       setIsRunning(false);
       console.log('Timer Finished');
-      // Perform actions when the timer finishes
+      setLoading(true);
+      sendMessages();
+      navigation.goBack();
+      setLoading(false);
     } else {
       setTimer(timer - 1);
     }
@@ -61,32 +66,40 @@ const SendAlertScreen = ({navigation}) => {
       .collection('contacts')
       .doc(userData.id)
       .get();
-    const contactData = contacts.data();
-    setContactData(contactData);
-    let phoneNumbers;
 
-    if (contactData && contactData.contactList) {
-      phoneNumbers = contactData.contactList.map(contact => contact.number);
+    const usersOfCircle = circle.usersOfCircles;
+    const externalContacts = contacts.data();
+    const contactData = externalContacts.contactList.map(
+      contact => contact.number,
+    );
+    console.log(contactData, '...contactData');
+    const usersQuerySnapshot = await firestore()
+      .collection('users')
+      .where('id', 'in', usersOfCircle)
+      .get();
+
+    const usersNumbers = usersQuerySnapshot.docs.map(
+      doc => doc.data().mobileNumber,
+    );
+
+    console.log(contactData, usersNumbers, 'contactData, usersNumbers');
+
+    let mergedContacts;
+    if (contactData && contactData.length > 0) {
+      mergedContacts = contactData.concat(usersNumbers);
+      console.log(mergedContacts, '...mergedContactList1');
+      setContactsToSendMsgs(mergedContacts);
     } else {
-      console.error('Contact data not found or contactList is empty');
+      mergedContacts = usersNumbers;
+      console.log(mergedContacts, '...mergedContactList2');
+      setContactsToSendMsgs(mergedContacts);
+      console.log(contactsToSendMsgs, '..contactsToSendMsgs');
     }
-    // const to = phoneNumbers.join(',');
-    // const url = `sms:${to}?body=${encodeURIComponent(route.params.message)}`;
-    // Linking.openURL(url)
-    //   .then(() => {
-    //     console.log('SMS app opened successfully');
-    //   })
-    //   .catch(err => {
-    //     console.error('Error(sendMessages): ', err);
-    //   });
-    // alert('Messages Sent');
-    // navigation.goBack();
-
     if (isEnabled) {
       SendSMS.send(
         {
           body: route.params.message,
-          recipients: phoneNumbers,
+          recipients: mergedContacts,
           successTypes: ['sent', 'queued'],
           allowAndroidSendWithoutReadPermission: true,
         },
@@ -107,11 +120,11 @@ const SendAlertScreen = ({navigation}) => {
     <>
       <SafeAreaView style={styles.container}>
         {/* <View
-          style={{
-            alignItems: 'center',
-            marginTop: verticalScale(40),
-            // justifyContent: 'center'
-          }}> */}
+            style={{
+              alignItems: 'center',
+              marginTop: verticalScale(40),
+              // justifyContent: 'center'
+            }}> */}
         <Text
           style={{
             color: 'white',

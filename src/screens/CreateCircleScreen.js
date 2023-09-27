@@ -112,6 +112,7 @@ const CreateCircleScreen = ({navigation}) => {
         if (checkResult.userAlreadyInCircle) {
           console.log('User is already in the circle:', enteredCode);
           Alert.alert('User is already in the circle.');
+          navigation.goBack();
         } else {
           console.log(
             'Circle code matches and user is not in the circle:',
@@ -129,7 +130,7 @@ const CreateCircleScreen = ({navigation}) => {
             console.log('User added to the circle:', userId);
             const userDocRef = firestore().collection('users').doc(userId);
             await userDocRef.update({
-              activeCircleCode: circleCode,
+              activeCircleCode: enteredCode,
             });
             Alert.alert('You have been added to the circle.');
             navigation.replace('Home');

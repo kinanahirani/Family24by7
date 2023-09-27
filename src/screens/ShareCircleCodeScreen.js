@@ -14,8 +14,10 @@ import {
   verticalScale,
 } from '../helpers/sizeHelpers';
 import Ionicons from 'react-native-vector-icons/Ionicons';
+import {useSelector} from 'react-redux';
 
 const ShareCircleCodeScreen = ({navigation}) => {
+  const circle = useSelector(state => state.circle.data);
   return (
     <ScrollView style={styles.container}>
       <View
@@ -40,7 +42,7 @@ const ShareCircleCodeScreen = ({navigation}) => {
             fontWeight: '400',
             color: 'white',
           }}>
-          Kinana Hirani's circle
+          {circle.circleName}
         </Text>
       </View>
 
@@ -85,7 +87,7 @@ const ShareCircleCodeScreen = ({navigation}) => {
             color: 'rgba(119,79,251,255)',
             marginTop: verticalScale(50),
           }}>
-          GJRXFV
+          {circle.circleCode}
         </Text>
         <TouchableOpacity style={{marginTop: verticalScale(15)}}>
           <Text

@@ -68,7 +68,7 @@ const AddNewPlaceScreen = ({navigation}) => {
   useEffect(() => {
     const fetchExistingPlaces = async () => {
       try {
-        const circleCode = circle.joinedCircles[0].circleCode;
+        const circleCode = circle.circleCode;
         const placesCollectionRef = firestore()
           .collection('places')
           .doc(circleCode)
@@ -126,7 +126,7 @@ const AddNewPlaceScreen = ({navigation}) => {
     } else {
       const placesCollectionRef = firestore()
         .collection('places')
-        .doc(circle.joinedCircles[0].circleCode)
+        .doc(circle.circleCode)
         .collection('addedPlaces');
 
       await placesCollectionRef.add({
@@ -174,7 +174,7 @@ const AddNewPlaceScreen = ({navigation}) => {
 
   const sendNotifications = async () => {
     try {
-      const circleMembers = circle.joinedCircles[0].usersOfCircles;
+      const circleMembers = circle.usersOfCircles;
       const tokens = [];
 
       for (const userId of circleMembers) {
@@ -189,6 +189,8 @@ const AddNewPlaceScreen = ({navigation}) => {
           if (user && user.fcmToken) {
             tokens.push(user.fcmToken);
           }
+        } else {
+          console.log('Only one user in the circle.');
         }
       }
       const notificationMessage = `New Place "${placeName}" added by ${userData.name}`;

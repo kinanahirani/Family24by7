@@ -9,8 +9,11 @@ const userSlice = createSlice({
     setUserData(state, action) {
       state.data = action.payload;
     },
+    updateActiveCircleCode(state, action) {
+      state.data.activeCircleCode = action.payload.activeCircleCode;
+    },
   },
 });
 
-export const {setUserData} = userSlice.actions;
+export const {setUserData, updateActiveCircleCode} = userSlice.actions;
 export default userSlice.reducer;

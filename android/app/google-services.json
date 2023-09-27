@@ -22,6 +22,14 @@
           }
         },
         {
+          "client_id": "410480316998-uv24bcl8pjnuk3fbhrtf8gk9frarh74j.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.locationtracker",
+            "certificate_hash": "c87e4237950620f248c4e2b20c1d5a5c07ee465c"
+          }
+        },
+        {
           "client_id": "410480316998-7dfotb4j283mjpbg5jkmoupe1h3ehab8.apps.googleusercontent.com",
           "client_type": 3
         }
