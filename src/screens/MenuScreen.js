@@ -15,7 +15,7 @@ import {
   verticalScale,
 } from '../helpers/sizeHelpers';
 import {useDispatch, useSelector} from 'react-redux';
-import {setUserData} from '../redux/slices/userSlice';
+import {setUserData, updateActiveCircleCode} from '../redux/slices/userSlice';
 import {useNavigation} from '@react-navigation/native';
 import store from '../redux/store';
 import {persistStore} from 'redux-persist';
@@ -26,6 +26,7 @@ import {
   GoogleSigninButton,
   statusCodes,
 } from '@react-native-google-signin/google-signin';
+import {setCircleData} from '../redux/slices/circleDataSlice';
 
 const MenuScreen = () => {
   const dispatch = useDispatch();
@@ -53,6 +54,8 @@ const MenuScreen = () => {
     }
 
     dispatch(setUserData(''));
+    dispatch(updateActiveCircleCode(''));
+    dispatch(setCircleData(''));
     await persistStore(store).purge();
     const currentUser = auth().currentUser;
     if (currentUser) {

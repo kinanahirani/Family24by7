@@ -68,6 +68,7 @@ const AddNewPlaceScreen = ({navigation}) => {
   useEffect(() => {
     const fetchExistingPlaces = async () => {
       try {
+        console.log(circle, '...circle');
         const circleCode = circle.circleCode;
         const placesCollectionRef = firestore()
           .collection('places')

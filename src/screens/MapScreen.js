@@ -21,7 +21,7 @@ import {DrawerActions} from '@react-navigation/native';
 import BottomSheet, {BottomSheetScrollView} from '@gorhom/bottom-sheet';
 import {GestureHandlerRootView} from 'react-native-gesture-handler';
 import Geolocation from 'react-native-geolocation-service';
-import MapView, {Marker} from 'react-native-maps';
+import MapView, {Circle, Marker} from 'react-native-maps';
 import firestore from '@react-native-firebase/firestore';
 import SelectCircle from '../components/SelectCircle';
 import UsersLocationTrack from '../components/UsersLocationTrack';
@@ -45,13 +45,38 @@ const MapScreen = () => {
   const refRBSheet = useRef();
   const [bottomSheetVisible, setBottomSheetVisible] = useState(false);
   const [usersData, setUsersData] = useState([]);
+  const [existingPlaces, setExistingPlaces] = useState([]);
   const dispatch = useDispatch();
   const circle = useSelector(state => state.circle.data);
   Geocoder.init('AIzaSyB09PIaNrUXMikGy415TQ3tCqYy8uXbpTs');
 
   useEffect(() => {
     fetchData();
-  }, []);
+  }, [userData]);
+
+  useEffect(() => {
+    const fetchExistingPlaces = async () => {
+      try {
+        const circleCode = circle.circleCode;
+        const placesCollectionRef = firestore()
+          .collection('places')
+          .doc(circleCode)
+          .collection('addedPlaces');
+
+        const placesOfTheCircle = await placesCollectionRef.get();
+        const placesData = placesOfTheCircle.docs.map(doc => ({
+          id: doc.id,
+          ...doc.data(),
+        }));
+        console.log(placesData, '....placesData');
+        setExistingPlaces(placesData);
+      } catch (error) {
+        console.error('Error(fetchExistingPlaces):', error);
+      }
+    };
+
+    fetchExistingPlaces();
+  }, [circle]);
 
   useEffect(() => {
     if (latitude && longitude) {
@@ -101,7 +126,7 @@ const MapScreen = () => {
       console.log(activeCircleData, '...activeCircleData');
 
       if (activeCircleData) {
-        // dispatch(setCircleData(activeCircleData));
+        dispatch(setCircleData(activeCircleData));
         getUsersOfCircles(activeCircleData);
       } else {
         console.log('Document does not exist');
@@ -364,6 +389,19 @@ const MapScreen = () => {
           latitudeDelta: 0.0922,
           longitudeDelta: 0.0421,
         }}>
+        {existingPlaces.map(place => (
+          <Circle
+            key={place.id}
+            center={{
+              latitude: place.latitude,
+              longitude: place.longitude,
+            }}
+            radius={place.radius}
+            strokeWidth={1}
+            strokeColor={'rgba(0, 255, 0, 0.2)'}
+            fillColor={'rgba(0, 255, 0, 0.2)'}
+          />
+        ))}
         <Marker draggable coordinate={{latitude, longitude}}>
           <CMarker img={userData.profilePicture} />
         </Marker>
@@ -741,6 +779,7 @@ const MapScreen = () => {
                 </View>
                 <TouchableOpacity
                   activeOpacity={0.7}
+                  onPress={() => navigation.navigate('AddNewPlace')}
                   style={{
                     alignItems: 'center',
                     justifyContent: 'center',

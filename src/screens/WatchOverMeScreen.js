@@ -19,6 +19,7 @@ import {TextInput} from 'react-native-paper';
 import {useSelector} from 'react-redux';
 import SendSMS from 'react-native-sms';
 import {GooglePlacesAutocomplete} from 'react-native-google-places-autocomplete';
+import firestore from '@react-native-firebase/firestore';
 
 const WatchOverMeScreen = ({navigation}) => {
   const startLocation = useSelector(state => state.location.address);
@@ -28,10 +29,69 @@ const WatchOverMeScreen = ({navigation}) => {
   const [isEnabled, setIsEnabled] = useState(true);
   const [isSearching, setIsSearching] = useState(false);
   const toggleSwitch = () => setIsEnabled(previousState => !previousState);
+  const circle = useSelector(state => state.circle.data);
+  const userData = useSelector(state => state.user.data);
+  const [contactsToSendMsgs, setContactsToSendMsgs] = useState([]);
 
   useEffect(() => {
     console.log(startLocation, 'startLocation');
   }, []);
+
+  const handleSendAlert = async () => {
+    const contacts = await firestore()
+      .collection('contacts')
+      .doc(userData.id)
+      .get();
+
+    const usersOfCircle = circle.usersOfCircles;
+    const externalContacts = contacts?.data();
+    const contactData = externalContacts?.contactList?.map(
+      contact => contact.number,
+    );
+    console.log(contactData, '...contactData');
+    const usersQuerySnapshot = await firestore()
+      .collection('users')
+      .where('id', 'in', usersOfCircle)
+      .get();
+
+    const usersNumbers = usersQuerySnapshot.docs.map(
+      doc => doc.data().mobileNumber,
+    );
+
+    console.log(contactData, usersNumbers, 'contactData, usersNumbers');
+
+    let mergedContacts;
+    if (contactData && contactData.length > 0) {
+      mergedContacts = contactData.concat(usersNumbers);
+      console.log(mergedContacts, '...mergedContactList1');
+      setContactsToSendMsgs(mergedContacts);
+    } else {
+      mergedContacts = usersNumbers;
+      console.log(mergedContacts, '...mergedContactList2');
+      setContactsToSendMsgs(mergedContacts);
+      console.log(contactsToSendMsgs, '..contactsToSendMsgs');
+    }
+    if (isEnabled) {
+      SendSMS.send(
+        {
+          body: `I am going from ${startLocation} to ${destination}. please watch over me.`,
+          recipients: mergedContacts,
+          successTypes: ['sent', 'queued'],
+          allowAndroidSendWithoutReadPermission: true,
+        },
+        (completed, cancelled, error) => {
+          if (completed) {
+            console.log('SMS sent successfully');
+          } else if (cancelled) {
+            console.log('SMS cancelled');
+          } else if (error) {
+            console.error('Error sending SMS:', error);
+          }
+        },
+      );
+    }
+  };
+
   return (
     <>
       <SafeAreaView style={{flexGrow: 1, backgroundColor: 'white'}}>
@@ -174,6 +234,7 @@ const WatchOverMeScreen = ({navigation}) => {
           </View>
         </View>
         <TouchableOpacity
+          onPress={handleSendAlert}
           style={{
             backgroundColor: 'rgba(119,79,251,255)',
             padding: moderateScale(15),

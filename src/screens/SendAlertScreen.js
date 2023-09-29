@@ -68,8 +68,8 @@ const SendAlertScreen = ({navigation}) => {
       .get();
 
     const usersOfCircle = circle.usersOfCircles;
-    const externalContacts = contacts.data();
-    const contactData = externalContacts.contactList.map(
+    const externalContacts = contacts?.data();
+    const contactData = externalContacts?.contactList?.map(
       contact => contact.number,
     );
     console.log(contactData, '...contactData');
