@@ -83,7 +83,6 @@ const MapScreen = () => {
       Geocoder.from(latitude, longitude)
         .then(json => {
           const addressComponent = json.results[0].address_components;
-          console.log('Address Data in use effect:', addressComponent);
           const addressString = addressComponent
             .map(component => component.long_name)
             .join(', ');
@@ -156,49 +155,6 @@ const MapScreen = () => {
       console.log('Error(getUsersOfCircles): ', err);
     }
   };
-
-  // const getCurrentLocation = async () => {
-  //   try {
-  //     const granted = await PermissionsAndroid.request(
-  //       PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
-  //       {
-  //         title: 'Location Permission',
-  //         message: 'App needs access to your location',
-  //         buttonNeutral: 'Ask Me Later',
-  //         buttonNegative: 'Cancel',
-  //         buttonPositive: 'OK',
-  //       },
-  //     );
-  //     if (granted === PermissionsAndroid.RESULTS.GRANTED) {
-  //       return new Promise((resolve, reject) => {
-  //         Geolocation.getCurrentPosition(
-  //           async position => {
-  //             // console.log(position, 'position');
-  //             // setLatitude(position.coords.latitude);
-  //             // setLongitude(position.coords.longitude);
-  //             position => {
-  //               console.log(position, 'position');
-  //               setLatitude(position.coords.latitude);
-  //               setLongitude(position.coords.longitude);
-  //               resolve(position); // Resolve with the location data
-  //             },
-  //             error => {
-  //               console.log(error.code, error.message);
-  //               reject(error); // Reject with an error if there's an issue
-  //             },
-  //           },
-  //           {enableHighAccuracy: true, timeout: 15000, maximumAge: 10000},
-  //         );
-  //       });
-  //     } else {
-  //       console.log('Location permission denied');
-  //       return null;
-  //     }
-  //   } catch (err) {
-  //     console.warn(err);
-  //     return err;
-  //   }
-  // };
 
   const getCurrentLocation = async () => {
     try {

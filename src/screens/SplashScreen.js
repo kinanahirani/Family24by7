@@ -9,14 +9,14 @@ const SplashScreen = () => {
   let navigation = useNavigation();
   const userData = useSelector(state => state.user.data);
 
-  useEffect(()=>{
+  useEffect(() => {
     setTimeout(() => {
-    if (userData && userData.name) {
-      navigation.replace('Home');
-    } else {
-      navigation.replace('loginoptions');
-    }
-  },1000)
+      if (userData && userData.name) {
+        navigation.replace('Home');
+      } else {
+        navigation.replace('loginoptions');
+      }
+    }, 1000);
   }, [userData, navigation]);
 
   return (

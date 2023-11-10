@@ -41,10 +41,52 @@ import ContactListScreen from './src/screens/ContactListScreen';
 import AddNewPlaceScreen from './src/screens/AddNewPlaceScreen';
 import WatchOverMeScreen from './src/screens/WatchOverMeScreen';
 import CustomDrawerContent from './src/components/CustomDrawerContent';
+import BackgroundLocationService from './src/helpers/BackgroundLocationService';
+import BackgroundService from 'react-native-background-actions';
+import RNLocation from 'react-native-location';
+import ReactNativeForegroundService from '@supersami/rn-foreground-service';
 
 const Tab = createBottomTabNavigator();
 const Drawer = createDrawerNavigator();
 const Stack = createNativeStackNavigator();
+// const sleep = time => new Promise(resolve => setTimeout(() => resolve(), time));
+
+// BackgroundService.on('expiration', () => {
+//   console.log('I am being closed :(');
+// });
+
+// const veryIntensiveTask = async taskDataArguments => {
+//   // Example of an infinite loop task
+//   const {delay} = taskDataArguments;
+//   await new Promise(async resolve => {
+//     for (let i = 0; BackgroundService.isRunning(); i++) {
+//       console.log(i);
+//       await sleep(delay);
+//     }
+//   });
+// };
+
+// const options = {
+//   taskName: 'updating location',
+//   taskTitle: 'updating location',
+//   taskDesc: 'updating location description',
+//   taskIcon: {
+//     name: 'ic_launcher',
+//     type: 'mipmap',
+//   },
+//   color: '#ff00ff',
+//   linkingURI: 'yourSchemeHere://chat/jane', // See Deep Linking for more info
+//   parameters: {
+//     delay: 1000,
+//   },
+// };
+
+// await BackgroundService.start(veryIntensiveTask, options);
+// await BackgroundService.updateNotification({
+//   taskDesc: 'New ExampleTask description',
+// }); // Only Android, iOS will ignore this call
+// // iOS will also run everything here in the background until .stop() is called
+// await BackgroundService.stop();
 
 const CustomTabNavigator = () => {
   return (
@@ -228,6 +270,85 @@ const App = () => {
     backgroundMessage();
     requestUserPermission();
     onMsg();
+  }, []);
+
+  let playing = BackgroundService.isRunning();
+
+  const toggleBackground = async () => {
+    playing = !playing;
+    if (playing) {
+      try {
+        console.log('trying');
+        await BackgroundService.start(taskRandom, options);
+        console.log('started');
+      } catch (err) {
+        console.log(err);
+      }
+    } else {
+      console.log('stopping');
+      BackgroundService.stop();
+    }
+  };
+
+  useEffect(() => {
+    console.log('in useEffect');
+    // RNLocation.configure({
+    //   distanceFilter: 500,
+    //   desiredAccuracy: {
+    //     ios: 'best',
+    //     android: 'balancedPowerAccuracy',
+    //   },
+    //   androidProvider: 'auto',
+    //   interval: 5000, // Milliseconds
+    //   fastestInterval: 10000, // Milliseconds
+    //   maxWaitTime: 5000, // Milliseconds
+    // });
+
+    // let locationSubscription = null;
+    // let locationTimeout = null;
+    // console.log('in useEffect2');
+
+    // ReactNativeForegroundService.add_task(
+    //   () => {
+    //     console.log('in useEffect3');
+    //     RNLocation.requestPermission({
+    //       ios: 'whenInUse',
+    //       android: {
+    //         detail: 'fine',
+    //       },
+    //     }).then(granted => {
+    //       console.log('Location Permissions1: ', granted);
+    //       // if has permissions try to obtain location with RN location
+    //       if (granted) {
+    //         locationSubscription && locationSubscription();
+    //         locationSubscription = RNLocation.subscribeToLocationUpdates(
+    //           ([locations]) => {
+    //             locationSubscription();
+    //             locationTimeout && clearTimeout(locationTimeout);
+    //             console.log(locations, 'locations in ');
+    //           },
+    //         );
+    //       } else {
+    //         locationSubscription && locationSubscription();
+    //         locationTimeout && clearTimeout(locationTimeout);
+    //         console.log('no permissions to obtain location');
+    //       }
+    //     });
+    //   },
+    //   {
+    //     delay: 1000,
+    //     onLoop: true,
+    //     taskId: 'taskid',
+    //     onError: e => console.log('Error logging:', e),
+    //   },
+    // );
+    // Start the background location service when the component mounts
+    BackgroundLocationService.start();
+
+    // // Clean up the service when the component unmounts (optional)
+    // return () => {
+    //   BackgroundLocationService.stop();
+    // };
   }, []);
 
   return (
