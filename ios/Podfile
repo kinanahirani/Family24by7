@@ -26,6 +26,8 @@ if linkage != nil
 end
 
 target 'locationTracker' do
+  use_frameworks! :linkage => :static
+  $RNFirebaseAsStaticFramework = true
   config = use_native_modules!
 
   # Flags change depending on the env values.
