@@ -6,6 +6,7 @@ import {
   ScrollView,
   PermissionsAndroid,
   Image,
+  SafeAreaView,
 } from 'react-native';
 import React, {useCallback, useEffect, useMemo, useRef, useState} from 'react';
 import {
@@ -266,10 +267,10 @@ const MapScreen = () => {
   return (
     <GestureHandlerRootView style={styles.container}>
       {bottomSheetVisible ? (
-        <View
+        <SafeAreaView
           style={{
             flexDirection: 'row',
-            height: moderateScale(50),
+            height: moderateScale(100),
             alignItems: 'center',
             paddingHorizontal: horizontalScale(16),
             padding: moderateScale(10),
@@ -279,7 +280,8 @@ const MapScreen = () => {
           <View style={{flexDirection: 'row', alignItems: 'center'}}>
             <TouchableOpacity
               onPress={() => setBottomSheetVisible(false)}
-              activeOpacity={0.7}>
+              activeOpacity={0.7}
+              style={{marginLeft: horizontalScale(10)}}>
               <Ionicons name="arrow-back" color="black" size={25} />
             </TouchableOpacity>
             <Text
@@ -292,13 +294,22 @@ const MapScreen = () => {
               Kinana Hirani
             </Text>
           </View>
-          <Feather name="refresh-cw" size={moderateScale(22)} color={'black'} />
-        </View>
+          <View style={{marginRight: horizontalScale(15)}}>
+            <Feather
+              name="refresh-cw"
+              size={moderateScale(22)}
+              color={'black'}
+            />
+          </View>
+        </SafeAreaView>
       ) : (
-        <View style={styles.header}>
+        <SafeAreaView style={styles.header}>
           <View style={styles.headingSubView}>
             <TouchableOpacity
-              style={{padding: moderateScale(5)}}
+              style={{
+                padding: moderateScale(5),
+                marginLeft: horizontalScale(10),
+              }}
               onPress={openDrawer}>
               <Feather name="menu" size={moderateScale(22)} color={'black'} />
             </TouchableOpacity>
@@ -329,10 +340,13 @@ const MapScreen = () => {
               name="notifications-outline"
               size={moderateScale(25)}
               color={'black'}
-              style={{marginLeft: horizontalScale(20)}}
+              style={{
+                marginLeft: horizontalScale(20),
+                marginRight: horizontalScale(15),
+              }}
             />
           </View>
-        </View>
+        </SafeAreaView>
       )}
 
       <MapView
@@ -822,7 +836,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   header: {
-    height: verticalScale(60),
+    height: verticalScale(100),
     padding: moderateScale(10),
     justifyContent: 'space-between',
     flexDirection: 'row',

@@ -9,6 +9,7 @@ import {
   SafeAreaView,
   Modal,
   Pressable,
+  StatusBar,
 } from 'react-native';
 import {useNavigation, DrawerActions} from '@react-navigation/native';
 import {

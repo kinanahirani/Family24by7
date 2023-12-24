@@ -9,6 +9,7 @@ import {
   ToastAndroid,
   Alert,
   ActivityIndicator,
+  SafeAreaView,
 } from 'react-native';
 import MapView, {Circle, Marker, Overlay} from 'react-native-maps';
 import Slider from 'react-native-slider';
@@ -227,7 +228,7 @@ const AddNewPlaceScreen = ({navigation}) => {
 
   return (
     <PaperProvider theme={customTextInputTheme}>
-      <View style={styles.container}>
+      <SafeAreaView style={styles.container}>
         <View
           style={{
             flexDirection: 'row',
@@ -479,7 +480,7 @@ const AddNewPlaceScreen = ({navigation}) => {
             </Text>
           )}
         </TouchableOpacity>
-      </View>
+      </SafeAreaView>
     </PaperProvider>
   );
 };

@@ -1,13 +1,15 @@
-import { StyleSheet, Text, View } from 'react-native'
-import React from 'react'
-import TopTabs from '../navigation/TopTabs'
+import {SafeAreaView, StyleSheet, Text, View} from 'react-native';
+import React from 'react';
+import TopTabs from '../navigation/TopTabs';
 
 const PlacesScreen = () => {
   return (
-    <TopTabs/>
-  )
-}
+    <SafeAreaView style={{flex: 1}}>
+      <TopTabs />
+    </SafeAreaView>
+  );
+};
 
-export default PlacesScreen
+export default PlacesScreen;
 
-const styles = StyleSheet.create({})
+const styles = StyleSheet.create({});

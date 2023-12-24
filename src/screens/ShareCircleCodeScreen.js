@@ -2,6 +2,7 @@ import {
   Image,
   SafeAreaView,
   ScrollView,
+  StatusBar,
   StyleSheet,
   Text,
   TouchableOpacity,
@@ -19,7 +20,8 @@ import {useSelector} from 'react-redux';
 const ShareCircleCodeScreen = ({navigation}) => {
   const circle = useSelector(state => state.circle.data);
   return (
-    <ScrollView style={styles.container}>
+    <SafeAreaView style={styles.container}>
+      <StatusBar backgroundColor={'rgba(119,79,251,255)'} />
       <View
         style={{
           flexDirection: 'row',
@@ -122,7 +124,7 @@ const ShareCircleCodeScreen = ({navigation}) => {
           </Text>
         </TouchableOpacity>
       </View>
-    </ScrollView>
+    </SafeAreaView>
   );
 };
 

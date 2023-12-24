@@ -21,7 +21,10 @@ const SplashScreen = () => {
 
   return (
     <View style={styles.container}>
-      <StatusBar backgroundColor={'rgba(119,79,251,255)'} />
+      <StatusBar
+        backgroundColor={'rgba(119,79,251,255)'}
+        barStyle={'default'}
+      />
       <Image style={styles.img} source={require('../assets/images/logo.png')} />
     </View>
   );

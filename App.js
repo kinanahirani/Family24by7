@@ -41,9 +41,8 @@ import ContactListScreen from './src/screens/ContactListScreen';
 import AddNewPlaceScreen from './src/screens/AddNewPlaceScreen';
 import WatchOverMeScreen from './src/screens/WatchOverMeScreen';
 import CustomDrawerContent from './src/components/CustomDrawerContent';
-import BackgroundLocationService from './src/helpers/BackgroundLocationService';
+// import BackgroundLocationService from './src/helpers/BackgroundLocationService';
 import BackgroundService from 'react-native-background-actions';
-import RNLocation from 'react-native-location';
 import ReactNativeForegroundService from '@supersami/rn-foreground-service';
 
 const Tab = createBottomTabNavigator();
@@ -95,7 +94,7 @@ const CustomTabNavigator = () => {
         headerShown: false,
         tabBarShowLabel: true,
         tabBarStyle: {
-          height: verticalScale(65),
+          height: verticalScale(80),
           width: '100%',
         },
         tabBarItemStyle: {
@@ -265,12 +264,12 @@ const CustomDrawerNavigator = () => {
 };
 
 const App = () => {
-  useEffect(() => {
-    createChannelfunc();
-    backgroundMessage();
-    requestUserPermission();
-    onMsg();
-  }, []);
+  // useEffect(() => {
+  //   createChannelfunc();
+  //   backgroundMessage();
+  //   requestUserPermission();
+  //   onMsg();
+  // }, []);
 
   let playing = BackgroundService.isRunning();
 
@@ -343,7 +342,7 @@ const App = () => {
     //   },
     // );
     // Start the background location service when the component mounts
-    BackgroundLocationService.start();
+    // BackgroundLocationService.start();
 
     // // Clean up the service when the component unmounts (optional)
     // return () => {
