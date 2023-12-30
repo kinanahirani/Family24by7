@@ -20,111 +20,124 @@ import {useSelector} from 'react-redux';
 const ShareCircleCodeScreen = ({navigation}) => {
   const circle = useSelector(state => state.circle.data);
   return (
-    <SafeAreaView style={styles.container}>
-      <StatusBar backgroundColor={'rgba(119,79,251,255)'} />
-      <View
-        style={{
-          flexDirection: 'row',
-          height: moderateScale(50),
-          alignItems: 'center',
-          paddingHorizontal: horizontalScale(16),
-          borderBottomWidth: 0.2,
-          borderBottomColor: 'rgba(128,128,128,0.5)',
-          backgroundColor: 'rgba(119,79,251,255)',
-        }}>
-        <TouchableOpacity
-          onPress={() => navigation.goBack()}
-          activeOpacity={0.7}>
-          <Ionicons name="arrow-back" color="white" size={moderateScale(22)} />
-        </TouchableOpacity>
-        <Text
-          style={{
-            marginLeft: horizontalScale(20),
-            fontSize: moderateScale(18),
-            fontWeight: '400',
-            color: 'white',
-          }}>
-          {circle.circleName}
-        </Text>
-      </View>
-
-      <View style={{alignItems: 'center'}}>
+    <>
+      <StatusBar
+        backgroundColor={'rgba(119,79,251,255)'}
+        translucent
+        barStyle="dark-content"
+      />
+      <SafeAreaView
+        style={{flex: 0, backgroundColor: 'rgba(119,79,251,255)'}}
+      />
+      <SafeAreaView style={styles.container}>
         <View
           style={{
-            marginTop: verticalScale(35),
-            width: '85%',
+            flexDirection: 'row',
+            height: moderateScale(50),
+            alignItems: 'center',
+            paddingHorizontal: horizontalScale(16),
+            borderBottomWidth: 0.2,
+            borderBottomColor: 'rgba(128,128,128,0.5)',
+            backgroundColor: 'rgba(119,79,251,255)',
           }}>
+          <TouchableOpacity
+            onPress={() => navigation.goBack()}
+            activeOpacity={0.7}>
+            <Ionicons
+              name="arrow-back"
+              color="white"
+              size={moderateScale(22)}
+            />
+          </TouchableOpacity>
           <Text
             style={{
-              textAlign: 'center',
-              color: 'black',
-              fontSize: moderateScale(13),
+              marginLeft: horizontalScale(20),
+              fontSize: moderateScale(18),
+              fontWeight: '400',
+              color: 'white',
             }}>
-            Family360 is better with friends and family, invite them to your
-            circle.
-          </Text>
-          <Text
-            style={{
-              textAlign: 'center',
-              color: 'black',
-              fontSize: moderateScale(13),
-            }}>
-            Just send them this code written below, and ask them to enter it
-            when they install the app and choose to join a Circle
+            {circle.circleName}
           </Text>
         </View>
-        <Text
-          style={{
-            fontWeight: 'bold',
-            fontSize: moderateScale(17),
-            color: 'black',
-            marginTop: verticalScale(70),
-          }}>
-          Share this code to invite people in your circle
-        </Text>
-        <Text
-          style={{
-            fontWeight: '500',
-            fontSize: moderateScale(30),
-            color: 'rgba(119,79,251,255)',
-            marginTop: verticalScale(50),
-          }}>
-          {circle.circleCode}
-        </Text>
-        <TouchableOpacity style={{marginTop: verticalScale(15)}}>
+
+        <View style={{alignItems: 'center'}}>
+          <View
+            style={{
+              marginTop: verticalScale(35),
+              width: '85%',
+            }}>
+            <Text
+              style={{
+                textAlign: 'center',
+                color: 'black',
+                fontSize: moderateScale(13),
+              }}>
+              Family360 is better with friends and family, invite them to your
+              circle.
+            </Text>
+            <Text
+              style={{
+                textAlign: 'center',
+                color: 'black',
+                fontSize: moderateScale(13),
+              }}>
+              Just send them this code written below, and ask them to enter it
+              when they install the app and choose to join a Circle
+            </Text>
+          </View>
           <Text
             style={{
-              color: 'rgba(119,79,251,255)',
-              fontSize: moderateScale(13),
+              fontWeight: 'bold',
+              fontSize: moderateScale(17),
+              color: 'black',
+              marginTop: verticalScale(70),
             }}>
-            Show QR Code
+            Share this code to invite people in your circle
           </Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity
-          style={[styles.shareButtons, {marginTop: moderateScale(30)}]}
-          activeOpacity={0.7}>
-          <Text style={styles.shareText}>Share invite link</Text>
-        </TouchableOpacity>
-
-        <Image
-          source={require('../assets/images/whatsapp_icon.png')}
-          style={{width: horizontalScale(38), height: horizontalScale(38)}}
-        />
-
-        <TouchableOpacity
-          onPress={() => navigation.goBack()}
-          style={{marginTop: verticalScale(20)}}>
           <Text
             style={{
+              fontWeight: '500',
+              fontSize: moderateScale(30),
               color: 'rgba(119,79,251,255)',
-              fontSize: moderateScale(13),
+              marginTop: verticalScale(50),
             }}>
-            DONE? (Tap to go back)
+            {circle.circleCode}
           </Text>
-        </TouchableOpacity>
-      </View>
-    </SafeAreaView>
+          <TouchableOpacity style={{marginTop: verticalScale(15)}}>
+            <Text
+              style={{
+                color: 'rgba(119,79,251,255)',
+                fontSize: moderateScale(13),
+              }}>
+              Show QR Code
+            </Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={[styles.shareButtons, {marginTop: moderateScale(30)}]}
+            activeOpacity={0.7}>
+            <Text style={styles.shareText}>Share invite link</Text>
+          </TouchableOpacity>
+
+          <Image
+            source={require('../assets/images/whatsapp_icon.png')}
+            style={{width: horizontalScale(38), height: horizontalScale(38)}}
+          />
+
+          <TouchableOpacity
+            onPress={() => navigation.goBack()}
+            style={{marginTop: verticalScale(20)}}>
+            <Text
+              style={{
+                color: 'rgba(119,79,251,255)',
+                fontSize: moderateScale(13),
+              }}>
+              DONE? (Tap to go back)
+            </Text>
+          </TouchableOpacity>
+        </View>
+      </SafeAreaView>
+    </>
   );
 };
 

@@ -78,177 +78,187 @@ const CustomDrawerContent = props => {
   };
 
   return (
-    <SafeAreaView style={{flex: 1}}>
-      <ScrollView>
-        <View
-          style={{
-            backgroundColor: 'rgba(119,79,251,255)',
-            padding: moderateScale(15),
-          }}>
-          <Text
+    <>
+      <StatusBar
+        backgroundColor={'rgba(119,79,251,255)'}
+        translucent
+        barStyle="dark-content"
+      />
+      <SafeAreaView
+        style={{flex: 0, backgroundColor: 'rgba(119,79,251,255)'}}
+      />
+      <SafeAreaView style={{flex: 1}}>
+        <ScrollView>
+          <View
             style={{
-              color: 'white',
-              fontWeight: 'bold',
-              fontSize: moderateScale(14),
-              marginTop: verticalScale(10),
+              backgroundColor: 'rgba(119,79,251,255)',
+              padding: moderateScale(15),
             }}>
-            Family 360
-          </Text>
-          <Text
+            <Text
+              style={{
+                color: 'white',
+                fontWeight: 'bold',
+                fontSize: moderateScale(14),
+                marginTop: verticalScale(10),
+              }}>
+              Family 360
+            </Text>
+            <Text
+              style={{
+                color: 'white',
+                fontSize: moderateScale(14),
+                marginTop: verticalScale(10),
+                marginBottom: verticalScale(20),
+                width: '80%',
+              }}>
+              The locator that cares for your{' '}
+              <Text style={{textDecorationLine: 'underline'}}>privacy</Text>!
+            </Text>
+          </View>
+          <View
             style={{
-              color: 'white',
-              fontSize: moderateScale(14),
-              marginTop: verticalScale(10),
-              marginBottom: verticalScale(20),
-              width: '80%',
+              borderBottomWidth: 1,
+              borderBottomColor: 'rgba(128,128,128,0.3)',
             }}>
-            The locator that cares for your{' '}
-            <Text style={{textDecorationLine: 'underline'}}>privacy</Text>!
-          </Text>
-        </View>
-        <View
-          style={{
-            borderBottomWidth: 1,
-            borderBottomColor: 'rgba(128,128,128,0.3)',
-          }}>
-          <Text
+            <Text
+              style={{
+                padding: moderateScale(10),
+                marginTop: verticalScale(7),
+                fontSize: moderateScale(14),
+                color: 'gray',
+                marginLeft: horizontalScale(5),
+              }}>
+              My Circles
+            </Text>
+            <CDrawerButton
+              text={'Switch Circles'}
+              iconName={'refresh'}
+              icon={'MaterialCommunityIcons'}
+              onPress={handleSwitchCircles}
+            />
+            <SelectCircle ref={refRBSheet} />
+            <CDrawerButton
+              text={'Add circle'}
+              iconName={'plus'}
+              extraStyles={{marginVertical: verticalScale(7)}}
+              icon={'MaterialCommunityIcons'}
+              onPress={toggleCreateCircleModal}
+            />
+            <CDrawerButton
+              text={'Join circle?'}
+              iconName={'plus'}
+              extraStyles={{marginBottom: verticalScale(10)}}
+              icon={'MaterialCommunityIcons'}
+              onPress={() =>
+                navigation.navigate('createcircle', {screenName: 'drawer'})
+              }
+            />
+          </View>
+          <View
             style={{
-              padding: moderateScale(10),
-              marginTop: verticalScale(7),
-              fontSize: moderateScale(14),
-              color: 'gray',
-              marginLeft: horizontalScale(5),
+              borderBottomWidth: 1,
+              borderBottomColor: 'rgba(128,128,128,0.3)',
             }}>
-            My Circles
-          </Text>
+            <Text
+              style={{
+                padding: moderateScale(10),
+                marginTop: verticalScale(7),
+                fontSize: moderateScale(14),
+                color: 'gray',
+                marginLeft: horizontalScale(5),
+              }}>
+              Subscription
+            </Text>
+            <CDrawerButton
+              text={'17 days left'}
+              iconName={'workspace-premium'}
+              extraStyles={{marginBottom: verticalScale(7)}}
+              extraTextStyles={{fontWeight: '600'}}
+              icon={'MaterialIcons'}
+            />
+          </View>
           <CDrawerButton
-            text={'Switch Circles'}
-            iconName={'refresh'}
-            icon={'MaterialCommunityIcons'}
-            onPress={handleSwitchCircles}
-          />
-          <SelectCircle ref={refRBSheet} />
-          <CDrawerButton
-            text={'Add circle'}
-            iconName={'plus'}
-            extraStyles={{marginVertical: verticalScale(7)}}
-            icon={'MaterialCommunityIcons'}
-            onPress={toggleCreateCircleModal}
-          />
-          <CDrawerButton
-            text={'Join circle?'}
-            iconName={'plus'}
-            extraStyles={{marginBottom: verticalScale(10)}}
-            icon={'MaterialCommunityIcons'}
-            onPress={() =>
-              navigation.navigate('createcircle', {screenName: 'drawer'})
-            }
-          />
-        </View>
-        <View
-          style={{
-            borderBottomWidth: 1,
-            borderBottomColor: 'rgba(128,128,128,0.3)',
-          }}>
-          <Text
-            style={{
-              padding: moderateScale(10),
-              marginTop: verticalScale(7),
-              fontSize: moderateScale(14),
-              color: 'gray',
-              marginLeft: horizontalScale(5),
-            }}>
-            Subscription
-          </Text>
-          <CDrawerButton
-            text={'17 days left'}
-            iconName={'workspace-premium'}
-            extraStyles={{marginBottom: verticalScale(7)}}
-            extraTextStyles={{fontWeight: '600'}}
+            text={'Check update'}
+            iconName={'system-update-alt'}
+            extraStyles={{marginTop: verticalScale(7)}}
             icon={'MaterialIcons'}
           />
-        </View>
-        <CDrawerButton
-          text={'Check update'}
-          iconName={'system-update-alt'}
-          extraStyles={{marginTop: verticalScale(7)}}
-          icon={'MaterialIcons'}
-        />
-        <CDrawerButton text={'iOS App'} iconName={'golf'} icon={'Ionicons'} />
-        <CDrawerButton
-          text={'Share App'}
-          iconName={'sharealt'}
-          icon={'AntDesign'}
-        />
-        <CDrawerButton
-          text={'Facebook Page'}
-          iconName={'facebook-square'}
-          icon={'AntDesign'}
-        />
-        <CDrawerButton
-          text={'Privacy Policy'}
-          iconName={'lock'}
-          icon={'AntDesign'}
-        />
-        <Modal
-          animationType="fade"
-          transparent={true}
-          visible={isCreateCircleModalVisible}
-          onRequestClose={() => setCreateCircleModalVisible(false)}>
-          <View style={styles.centeredView}>
-            <View style={styles.modalView}>
-              <Text style={styles.modalText}>Name your Circle</Text>
-              <Controller
-                control={control}
-                rules={{
-                  required: 'Please enter circle name.',
-                }}
-                render={({field: {onChange, onBlur, value}}) => (
-                  <>
-                    <TextInput
-                      mode="flat"
-                      onBlur={onBlur}
-                      onChangeText={onChange}
-                      value={value}
-                      style={styles.textInput}
-                      error={errors.circleName}
-                    />
-                    {errors.circleName && (
-                      <HelperText
-                        type="error"
-                        style={{
-                          alignSelf: 'flex-start',
-                          marginBottom: verticalScale(10),
-                        }}>
-                        {errors.circleName.message}
-                      </HelperText>
-                    )}
-                  </>
-                )}
-                name="circleName"
-              />
-              <View
-                style={{
-                  flexDirection: 'row',
-                  alignSelf: 'flex-end',
-                  marginTop: verticalScale(20),
-                }}>
-                <Pressable
-                  style={[styles.button, {marginRight: horizontalScale(10)}]}
-                  onPress={() => setCreateCircleModalVisible(false)}>
-                  <Text style={styles.textStyle}>BACK</Text>
-                </Pressable>
-                <Pressable
-                  style={[styles.button, {marginLeft: horizontalScale(10)}]}
-                  onPress={handleSubmit(handleCreateCircle)}>
-                  <Text style={styles.textStyle}>CREATE</Text>
-                </Pressable>
+          <CDrawerButton text={'iOS App'} iconName={'golf'} icon={'Ionicons'} />
+          <CDrawerButton
+            text={'Share App'}
+            iconName={'sharealt'}
+            icon={'AntDesign'}
+          />
+          <CDrawerButton
+            text={'Facebook Page'}
+            iconName={'facebook-square'}
+            icon={'AntDesign'}
+          />
+          <CDrawerButton
+            text={'Privacy Policy'}
+            iconName={'lock'}
+            icon={'AntDesign'}
+          />
+          <Modal
+            animationType="fade"
+            transparent={true}
+            visible={isCreateCircleModalVisible}
+            onRequestClose={() => setCreateCircleModalVisible(false)}>
+            <View style={styles.centeredView}>
+              <View style={styles.modalView}>
+                <Text style={styles.modalText}>Name your Circle</Text>
+                <Controller
+                  control={control}
+                  rules={{
+                    required: 'Please enter circle name.',
+                  }}
+                  render={({field: {onChange, onBlur, value}}) => (
+                    <>
+                      <TextInput
+                        mode="flat"
+                        onBlur={onBlur}
+                        onChangeText={onChange}
+                        value={value}
+                        style={styles.textInput}
+                        error={errors.circleName}
+                      />
+                      {errors.circleName && (
+                        <HelperText
+                          type="error"
+                          style={{
+                            alignSelf: 'flex-start',
+                            marginBottom: verticalScale(10),
+                          }}>
+                          {errors.circleName.message}
+                        </HelperText>
+                      )}
+                    </>
+                  )}
+                  name="circleName"
+                />
+                <View
+                  style={{
+                    flexDirection: 'row',
+                    alignSelf: 'flex-end',
+                    marginTop: verticalScale(20),
+                  }}>
+                  <Pressable
+                    style={[styles.button, {marginRight: horizontalScale(10)}]}
+                    onPress={() => setCreateCircleModalVisible(false)}>
+                    <Text style={styles.textStyle}>BACK</Text>
+                  </Pressable>
+                  <Pressable
+                    style={[styles.button, {marginLeft: horizontalScale(10)}]}
+                    onPress={handleSubmit(handleCreateCircle)}>
+                    <Text style={styles.textStyle}>CREATE</Text>
+                  </Pressable>
+                </View>
               </View>
             </View>
-          </View>
-        </Modal>
-      </ScrollView>
-    </SafeAreaView>
+          </Modal>
+        </ScrollView>
+      </SafeAreaView>
+    </>
   );
 };
 

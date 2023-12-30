@@ -7,6 +7,7 @@ import {
   PermissionsAndroid,
   Image,
   SafeAreaView,
+  Platform,
 } from 'react-native';
 import React, {useCallback, useEffect, useMemo, useRef, useState} from 'react';
 import {
@@ -36,6 +37,8 @@ import {useDispatch, useSelector} from 'react-redux';
 import {setCircleData} from '../redux/slices/circleDataSlice';
 import CMarker from '../components/CMarker';
 import {setLocationData} from '../redux/slices/locationSlice';
+import {usePermissions} from '../hooks/usePermissions';
+import {check, request, PERMISSIONS, RESULTS} from 'react-native-permissions';
 const customMapStyle = require('../../map/map.json');
 
 const MapScreen = () => {
@@ -49,6 +52,14 @@ const MapScreen = () => {
   const [existingPlaces, setExistingPlaces] = useState([]);
   const dispatch = useDispatch();
   const circle = useSelector(state => state.circle.data);
+
+  const {permissionsStatus, requestPermission, checkPermissions} =
+    usePermissions([
+      Platform.select({
+        android: PERMISSIONS.ANDROID.ACCESS_FINE_LOCATION,
+        ios: PERMISSIONS.IOS.LOCATION_WHEN_IN_USE,
+      }),
+    ]);
   Geocoder.init('AIzaSyB09PIaNrUXMikGy415TQ3tCqYy8uXbpTs');
 
   useEffect(() => {
@@ -159,36 +170,45 @@ const MapScreen = () => {
 
   const getCurrentLocation = async () => {
     try {
-      const granted = await PermissionsAndroid.request(
-        PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
-        {
-          title: 'Location Permission',
-          message: 'App needs access to your location',
-          buttonNeutral: 'Ask Me Later',
-          buttonNegative: 'Cancel',
-          buttonPositive: 'OK',
-        },
-      );
-      if (granted === PermissionsAndroid.RESULTS.GRANTED) {
-        return new Promise((resolve, reject) => {
-          Geolocation.getCurrentPosition(
-            async position => {
-              console.log(position, 'position');
-              setLatitude(position.coords.latitude);
-              setLongitude(position.coords.longitude);
-              resolve(position);
-            },
-            error => {
-              console.log(error.code, error.message);
-              reject(error);
-            },
-            {enableHighAccuracy: true, timeout: 15000, maximumAge: 30000},
-          );
-        });
-      } else {
-        console.log('Location permission denied');
-        return null;
+      // const granted = await PermissionsAndroid.request(
+      //   PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
+      //   {
+      //     title: 'Location Permission',
+      //     message: 'App needs access to your location',
+      //     buttonNeutral: 'Ask Me Later',
+      //     buttonNegative: 'Cancel',
+      //     buttonPositive: 'OK',
+      //   },
+      // );
+      const permission = Platform.select({
+        android: PERMISSIONS.ANDROID.ACCESS_FINE_LOCATION,
+        ios: PERMISSIONS.IOS.LOCATION_WHEN_IN_USE,
+      });
+
+      if (permissionsStatus[permission] !== 'granted') {
+        const granted = await requestPermission(permission);
+        if (granted !== 'granted') {
+          console.log('Location permission denied');
+          return null;
+        }
       }
+      // return new Promise((resolve, reject) => {
+      // if (granted === PermissionsAndroid.RESULTS.GRANTED) {
+      return new Promise((resolve, reject) => {
+        Geolocation.getCurrentPosition(
+          async position => {
+            console.log(position, 'position');
+            setLatitude(position.coords.latitude);
+            setLongitude(position.coords.longitude);
+            resolve(position);
+          },
+          error => {
+            console.log(error.code, error.message);
+            reject(error);
+          },
+          {enableHighAccuracy: true, timeout: 15000, maximumAge: 30000},
+        );
+      });
     } catch (err) {
       console.log('Error(getCurrentLocation): ', err);
       return err;

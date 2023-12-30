@@ -1,5 +1,13 @@
 import React, {useEffect, useState} from 'react';
-import {StyleSheet, Text, View, Image, TouchableOpacity, ActivityIndicator, SafeAreaView} from 'react-native';
+import {
+  StyleSheet,
+  Text,
+  View,
+  Image,
+  TouchableOpacity,
+  ActivityIndicator,
+  SafeAreaView,
+} from 'react-native';
 import ImageCropPicker from 'react-native-image-crop-picker';
 import {useDispatch, useSelector} from 'react-redux';
 import {TextInput, HelperText} from 'react-native-paper';
@@ -145,24 +153,38 @@ const EnterUserDetails = ({navigation}) => {
           flexDirection: 'row',
           height: moderateScale(50),
           alignItems: 'center',
-          paddingHorizontal: horizontalScale(16),
+          position: 'relative',
         }}>
         <TouchableOpacity
           onPress={() => navigation.goBack()}
-          activeOpacity={0.7}>
+          activeOpacity={0.7}
+          style={{
+            zIndex: 1,
+            paddingHorizontal: horizontalScale(16),
+          }}>
           <Ionicons name="arrow-back" color="black" size={25} />
         </TouchableOpacity>
-        <Text
+        <View
           style={{
-            marginLeft: 'auto',
-            marginRight: 'auto',
-            fontSize: moderateScale(18),
-            fontWeight: '600',
-            color: 'rgba(15, 24, 40, 1)',
+            position: 'absolute',
+            left: 0,
+            right: 0,
+            justifyContent: 'center',
+            alignItems: 'center',
+            height: moderateScale(50),
           }}>
-          Profile
-        </Text>
+          <Text
+            style={{
+              fontSize: moderateScale(18),
+              fontWeight: '600',
+              color: 'rgba(15, 24, 40, 1)',
+              textAlign: 'center',
+            }}>
+            Profile
+          </Text>
+        </View>
       </View>
+
       <View
         style={{
           justifyContent: 'center',
@@ -242,6 +264,7 @@ const EnterUserDetails = ({navigation}) => {
         <TouchableOpacity
           activeOpacity={0.7}
           style={styles.saveButton}
+          disabled={loading}
           onPress={handleSubmit(handleSave)}>
           {loading ? (
             <ActivityIndicator color="#fff" size="small" />
@@ -272,7 +295,7 @@ const styles = StyleSheet.create({
     right: 0,
     backgroundColor: 'white',
     borderRadius: moderateScale(30),
-    padding: moderateScale(10),
+    padding: moderateScale(6),
   },
   addIcon: {
     width: horizontalScale(24),

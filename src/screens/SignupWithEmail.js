@@ -256,7 +256,8 @@ const SignupWithEmail = () => {
           <TouchableOpacity
             style={styles.loginButtons}
             activeOpacity={0.7}
-            onPress={handleSubmit(onSubmit)}>
+            onPress={handleSubmit(onSubmit)}
+            disabled={loading}>
             {loading ? (
               <ActivityIndicator color="#fff" size="small" />
             ) : (
@@ -308,6 +309,10 @@ const styles = StyleSheet.create({
     height: verticalScale(50),
     marginBottom: moderateScale(28),
     elevation: 7,
+    shadowColor: '#000',
+    shadowOffset: {width: 0, height: 4},
+    shadowOpacity: 0.3,
+    shadowRadius: 5,
   },
   loginText: {
     color: 'white',
